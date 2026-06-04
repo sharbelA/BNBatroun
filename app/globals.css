@@ -1,26 +1,93 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Palette tokens ────────────────────────────────────────────────────────
+   Three families, each a Tailwind-accessible scale:
+     sand  – warm off-whites and beiges  (backgrounds, surfaces, borders)
+     sea   – Mediterranean blue          (brand, primary actions)
+     warm  – warm brown-greys            (body text, muted, dark surfaces)
+   ────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Sand */
+  --color-sand-50:  #FDFAF6;
+  --color-sand-100: #F5EDE0;
+  --color-sand-200: #EAD9C0;
+  --color-sand-300: #D9C09A;
+  --color-sand-400: #C4A472;
+  --color-sand-500: #A8864E;
+  --color-sand-600: #8A6B38;
+
+  /* Sea */
+  --color-sea-50:  #EBF4FB;
+  --color-sea-100: #D0E9F6;
+  --color-sea-200: #A1D2ED;
+  --color-sea-300: #5FB3DC;
+  --color-sea-400: #2A8EC2;
+  --color-sea-500: #1B6EA3;
+  --color-sea-600: #155280;
+  --color-sea-700: #103D62;
+  --color-sea-800: #0B2A45;
+
+  /* Warm */
+  --color-warm-50:  #F7F4F1;
+  --color-warm-100: #EDE7E0;
+  --color-warm-200: #D9CFC5;
+  --color-warm-300: #BFB0A2;
+  --color-warm-400: #9E8D7E;
+  --color-warm-500: #7E6D60;
+  --color-warm-600: #5F5047;
+  --color-warm-700: #443830;
+  --color-warm-800: #2C231C;
+  --color-warm-900: #1A120C;
 }
 
+/* ── CSS-variable-backed theme references (fonts, etc.) ─────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Semantic CSS variables ─────────────────────────────────────────────────
+   Use these in vanilla CSS rules. They reference the palette above so a
+   single change here propagates everywhere.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg-page:       var(--color-sand-50);
+  --bg-surface:    #ffffff;
+  --bg-muted:      var(--color-sand-100);
+
+  --text-primary:  var(--color-warm-900);
+  --text-muted:    var(--color-warm-500);
+
+  --border-light:  var(--color-sand-200);
+
+  --accent:        var(--color-sea-600);
+  --accent-hover:  var(--color-sea-700);
+
+  color-scheme: light;
 }
 
+/* ── Base styles ─────────────────────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Global focus ring ───────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-sea-400);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Subtle custom scrollbar (pointer devices only) ─────────────────────── */
+@media (pointer: fine) {
+  ::-webkit-scrollbar        { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  {
+    background: var(--color-sand-300);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-sand-400); }
 }
