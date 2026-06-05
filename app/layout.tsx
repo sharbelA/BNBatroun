@@ -1,22 +1,20 @@
-import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
-import './globals.css'
-
-const geist = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-  display: 'swap',
-})
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: 'Manzeli', template: '%s | Manzeli' },
-  description: 'Discover and book unique chalets in Batroun, Lebanon.',
-}
+  title: "Manzeli — Chalets & Vacation Rentals in Lebanon",
+  description:
+    "Find and book the best chalets, villas, and vacation homes across Lebanon. From Batroun beachfront to mountain retreats.",
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en" className={`${geist.variable} h-full`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html lang="en" className="h-full antialiased">
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
-  )
+  );
 }

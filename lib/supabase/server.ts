@@ -1,29 +1,38 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import type { Database } from './types'
+/**
+ * Supabase server client factory.
+ * Creates a fresh client per request for server components and actions.
+ *
+ * Usage:
+ *   import { createServerClient } from "@/lib/supabase/server";
+ *   const supabase = await createServerClient();
+ *   const { data } = await supabase.from("listings").select("*");
+ */
 
-export async function createClient() {
-  const cookieStore = await cookies()
+import { createServerClient as createClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-  return createServerClient<Database>(
+export async function createServerClient() {
+  const cookieStore = await cookies();
+
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll()
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
-            )
+            );
           } catch {
-            // setAll called from a Server Component — safe to ignore,
-            // the proxy middleware handles session refresh.
+            // Called from Server Component — cookies can't be set.
+            // Middleware will refresh the session instead.
           }
         },
       },
     }
-  )
+  );
 }
