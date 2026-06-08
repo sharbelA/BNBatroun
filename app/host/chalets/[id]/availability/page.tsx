@@ -21,25 +21,41 @@ export default async function HostAvailabilityPage(
   const availability = await getListingAvailabilityWindow(id)
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-12 md:px-6 md:py-16">
+    <main className="mx-auto w-full max-w-4xl px-4 py-12 md:px-6 md:py-16">
 
-      {/* Header */}
-      <div className="mb-8 flex items-center gap-4">
+      {/* Breadcrumb */}
+      <div className="mb-8">
         <Link
           href="/host/dashboard"
-          className="text-sm text-warm-500 hover:text-warm-900 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-warm-500 hover:text-warm-900 transition-colors"
         >
-          ← Dashboard
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8L10 4"/></svg>
+          Back to dashboard
         </Link>
       </div>
 
-      <h1 className="mb-1 text-2xl font-semibold text-warm-900">
-        {listing.title} — availability
-      </h1>
-      <p className="mb-8 text-sm text-warm-500">
-        Click a date to toggle it between available and blocked, or click and
-        drag to update a range of dates at once.
-      </p>
+      {/* Page header */}
+      <div
+        style={{
+          marginBottom: '32px',
+          paddingBottom: '24px',
+          borderBottom: '1px solid var(--border-light, #ebebeb)',
+        }}
+      >
+        <h1
+          style={{
+            fontSize: '24px',
+            fontWeight: 700,
+            color: 'var(--foreground)',
+            marginBottom: '6px',
+          }}
+        >
+          {listing.title}
+        </h1>
+        <p style={{ fontSize: '14px', color: 'var(--muted)' }}>
+          Manage your chalet&apos;s availability calendar
+        </p>
+      </div>
 
       <AvailabilityCalendar
         listingId={listing.id}

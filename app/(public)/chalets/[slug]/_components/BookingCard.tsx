@@ -10,6 +10,8 @@ import {
   isBefore,
   isEqual,
   startOfDay,
+  parseISO,
+  eachDayOfInterval,
 } from "date-fns";
 import { Icon } from "@/components/ui";
 
@@ -18,11 +20,17 @@ const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 
 type PickerField = "checkin" | "checkout" | null;
 
+interface AvailabilityEntry {
+  date: string;
+  status: string;
+}
+
 interface BookingCardProps {
   price: number;
   maxGuests: number;
   title: string;
   slug: string;
+  availability?: AvailabilityEntry[];
 }
 
 export default function BookingCard({
@@ -30,8 +38,37 @@ export default function BookingCard({
   maxGuests,
   title,
   slug,
+  availability = [],
 }: BookingCardProps) {
   const today = useMemo(() => startOfDay(new Date()), []);
+
+  // Compute unavailable dates (booked or blocked)
+  const { unavailableDates, bookedDates, blockedDates } = useMemo(() => {
+    const unavailable: Date[] = [];
+    const booked: Date[] = [];
+    const blocked: Date[] = [];
+    for (const entry of availability) {
+      if (entry.status === "booked" || entry.status === "blocked") {
+        const d = parseISO(entry.date);
+        unavailable.push(d);
+        if (entry.status === "booked") booked.push(d);
+        else blocked.push(d);
+      }
+    }
+    return { unavailableDates: unavailable, bookedDates: booked, blockedDates: blocked };
+  }, [availability]);
+
+  // Set of unavailable date strings for fast range checking
+  const unavailableSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const entry of availability) {
+      if (entry.status === "booked" || entry.status === "blocked") {
+        set.add(entry.date);
+      }
+    }
+    return set;
+  }, [availability]);
+
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
   const [guests, setGuests] = useState(Math.min(2, maxGuests));
@@ -77,8 +114,15 @@ export default function BookingCard({
 
   const total = nights * price;
 
+  // Check if any unavailable date falls within the selected range
+  const rangeConflict = useMemo(() => {
+    if (!checkIn || !checkOut || nights === 0) return false;
+    const days = eachDayOfInterval({ start: checkIn, end: addDays(checkOut, -1) });
+    return days.some((d) => unavailableSet.has(format(d, "yyyy-MM-dd")));
+  }, [checkIn, checkOut, nights, unavailableSet]);
+
   const whatsappUrl = useMemo(() => {
-    if (!checkIn || !checkOut || nights === 0) return null;
+    if (!checkIn || !checkOut || nights === 0 || rangeConflict) return null;
     const message = encodeURIComponent(
       `Hi! I'm interested in booking *${title}*\n\n` +
         `📅 Check-in: ${format(checkIn, "MMM d, yyyy")}\n` +
@@ -89,7 +133,7 @@ export default function BookingCard({
         `Listing: ${SITE_URL}/chalets/${slug}`
     );
     return `https://wa.me/${WA_NUMBER}?text=${message}`;
-  }, [checkIn, checkOut, guests, nights, total, title, slug]);
+  }, [checkIn, checkOut, guests, nights, total, title, slug, rangeConflict]);
 
   // Range modifiers for DayPicker
   const modifiers = useMemo(
@@ -99,16 +143,20 @@ export default function BookingCard({
       ...(checkIn && checkOut
         ? { range_middle: { after: checkIn, before: checkOut } }
         : {}),
+      ...(bookedDates.length ? { booked: bookedDates } : {}),
+      ...(blockedDates.length ? { blocked: blockedDates } : {}),
     }),
-    [checkIn, checkOut]
+    [checkIn, checkOut, bookedDates, blockedDates]
   );
 
   const disabled = useMemo(
-    () =>
-      openField === "checkout" && checkIn
-        ? { before: addDays(checkIn, 1) }
-        : { before: today },
-    [openField, checkIn, today]
+    () => [
+      ...(openField === "checkout" && checkIn
+        ? [{ before: addDays(checkIn, 1) }]
+        : [{ before: today }]),
+      ...unavailableDates,
+    ],
+    [openField, checkIn, today, unavailableDates]
   );
 
   const pickerSelected = openField === "checkin" ? checkIn : checkOut;
@@ -214,6 +262,20 @@ export default function BookingCard({
               range_end: "bk-range-end",
               range_middle: "bk-range-middle",
             }}
+            modifiersStyles={{
+              booked: {
+                backgroundColor: "#fee2e2",
+                color: "#b91c1c",
+                borderRadius: "50%",
+                opacity: 0.6,
+              },
+              blocked: {
+                backgroundColor: "#f3f4f6",
+                color: "#9ca3af",
+                borderRadius: "50%",
+                opacity: 0.6,
+              },
+            }}
             showOutsideDays={false}
           />
         </div>
@@ -263,6 +325,24 @@ export default function BookingCard({
             <span>Total</span>
             <span>${total.toLocaleString()}</span>
           </div>
+        </div>
+      )}
+
+      {/* ── Range conflict warning ── */}
+      {rangeConflict && (
+        <div
+          style={{
+            padding: "10px 14px",
+            borderRadius: "12px",
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
+            marginBottom: "12px",
+            fontSize: "13px",
+            color: "#b91c1c",
+            lineHeight: 1.5,
+          }}
+        >
+          Some dates in your range are unavailable. Please adjust your dates.
         </div>
       )}
 

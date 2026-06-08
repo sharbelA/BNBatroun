@@ -9,6 +9,7 @@ interface MobileBookingBarProps {
   maxGuests: number;
   title: string;
   slug: string;
+  availability?: { date: string; status: string }[];
 }
 
 export default function MobileBookingBar({
@@ -16,6 +17,7 @@ export default function MobileBookingBar({
   maxGuests,
   title,
   slug,
+  availability,
 }: MobileBookingBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -62,6 +64,7 @@ export default function MobileBookingBar({
               maxGuests={maxGuests}
               title={title}
               slug={slug}
+              availability={availability}
             />
           </div>
         </div>

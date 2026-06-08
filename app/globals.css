@@ -31,6 +31,43 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Monaco, monospace;
   --font-heading: Georgia, "Times New Roman", serif;
+
+  /* Warm gray palette (used for text) */
+  --color-warm-50:  #fafaf9;
+  --color-warm-100: #f5f5f4;
+  --color-warm-200: #e7e5e4;
+  --color-warm-300: #d6d3d1;
+  --color-warm-400: #a8a29e;
+  --color-warm-500: #78716c;
+  --color-warm-600: #57534e;
+  --color-warm-700: #44403c;
+  --color-warm-800: #292524;
+  --color-warm-900: #1c1917;
+  --color-warm-950: #0c0a09;
+
+  /* Sand palette (used for borders, subtle backgrounds) */
+  --color-sand-50:  #fdfdf9;
+  --color-sand-100: #f5f4ef;
+  --color-sand-200: #e8e6df;
+  --color-sand-300: #d5d2c9;
+  --color-sand-400: #b3afa3;
+  --color-sand-500: #948f82;
+  --color-sand-600: #7a756a;
+  --color-sand-700: #635f56;
+  --color-sand-800: #514e47;
+  --color-sand-900: #45423d;
+
+  /* Sea palette (accent blues for focus rings, links, admin UI) */
+  --color-sea-50:  #f0f9ff;
+  --color-sea-100: #e0f2fe;
+  --color-sea-200: #bae6fd;
+  --color-sea-300: #7dd3fc;
+  --color-sea-400: #38bdf8;
+  --color-sea-500: #0ea5e9;
+  --color-sea-600: #0284c7;
+  --color-sea-700: #0369a1;
+  --color-sea-800: #075985;
+  --color-sea-900: #0c4a6e;
 }
 
 /* ── Base styles ─────────────────────────────────────────────────────────── */

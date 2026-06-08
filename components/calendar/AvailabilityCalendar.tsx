@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition, useCallback } from "react";
 import { DayPicker } from "react-day-picker";
-import type { DayButtonProps } from "react-day-picker";
+import type { DayProps } from "react-day-picker";
 import "react-day-picker/style.css";
 import {
   addMonths,
@@ -16,6 +16,8 @@ import {
 import { toast } from "sonner";
 import { upsertAvailabilityAction } from "@/app/_actions/availability";
 import type { AvailabilityStatus } from "@/lib/supabase/types";
+
+/* ─── Types ─────────────────────────────────────────────────── */
 
 interface AvailabilityEntry {
   date: string;
@@ -34,17 +36,21 @@ type StatusMap = Record<
   { status: AvailabilityStatus; note: string | null }
 >;
 
+/* ─── Helpers ───────────────────────────────────────────────── */
+
 function dateKey(d: Date) {
   return format(d, "yyyy-MM-dd");
 }
 
 function rangeBetween(a: string, b: string): string[] {
-  const [start, end] =
-    parseISO(a) <= parseISO(b) ? [a, b] : [b, a];
-  return eachDayOfInterval({ start: parseISO(start), end: parseISO(end) }).map(
-    dateKey
-  );
+  const [start, end] = parseISO(a) <= parseISO(b) ? [a, b] : [b, a];
+  return eachDayOfInterval({
+    start: parseISO(start),
+    end: parseISO(end),
+  }).map(dateKey);
 }
+
+/* ─── Main component ───────────────────────────────────────── */
 
 export default function AvailabilityCalendar({
   listingId,
@@ -65,25 +71,44 @@ export default function AvailabilityCalendar({
     return map;
   });
 
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const [selection, setSelection] = useState<string[] | null>(null);
+  const [popupOpen, setPopupOpen] = useState(false);
   const dragRef = useRef<{ start: string; dragging: boolean } | null>(null);
-
-  const { available, booked, blocked } = useMemo(() => {
-    const available: Date[] = [];
-    const booked: Date[] = [];
-    const blocked: Date[] = [];
-    for (const [dateStr, entry] of Object.entries(statusMap)) {
-      const d = parseISO(dateStr);
-      if (entry.status === "available") available.push(d);
-      else if (entry.status === "booked") booked.push(d);
-      else blocked.push(d);
-    }
-    return { available, booked, blocked };
-  }, [statusMap]);
 
   const hasData = Object.keys(statusMap).length > 0;
 
+  /* ─── Compute date arrays for modifiers ─── */
+  const { availableDates, bookedDates, blockedDates, selectedDates } =
+    useMemo(() => {
+      const available: Date[] = [];
+      const booked: Date[] = [];
+      const blocked: Date[] = [];
+      for (const [dateStr, entry] of Object.entries(statusMap)) {
+        const d = parseISO(dateStr);
+        if (entry.status === "available") available.push(d);
+        else if (entry.status === "booked") booked.push(d);
+        else blocked.push(d);
+      }
+      const selected = (selection ?? []).map((s) => parseISO(s));
+      return {
+        availableDates: available,
+        bookedDates: booked,
+        blockedDates: blocked,
+        selectedDates: selected,
+      };
+    }, [statusMap, selection]);
+
+  /* ─── Counts ─── */
+  const counts = useMemo(() => {
+    return {
+      available: availableDates.length,
+      booked: bookedDates.length,
+      blocked: blockedDates.length,
+    };
+  }, [availableDates, bookedDates, blockedDates]);
+
+  /* ─── Server sync ─── */
   function applyChange(
     dates: string[],
     status: AvailabilityStatus,
@@ -96,6 +121,7 @@ export default function AvailabilityCalendar({
       return next;
     });
     setSelection(null);
+    setPopupOpen(false);
 
     startTransition(async () => {
       const result = await upsertAvailabilityAction(
@@ -109,116 +135,213 @@ export default function AvailabilityCalendar({
         toast.error(result.error);
       } else {
         toast.success(
-          dates.length > 1
-            ? `${dates.length} dates updated`
-            : "Date updated"
+          dates.length > 1 ? `${dates.length} dates updated` : "Date updated"
         );
       }
     });
   }
 
-  function handleDayMouseDown(day: Date) {
-    if (!interactive || isBefore(day, today)) return;
-    const key = dateKey(day);
-    dragRef.current = { start: key, dragging: false };
-    setSelection([key]);
-  }
+  /* ─── Mouse handlers (called from custom Day component) ─── */
+  const handleDown = useCallback(
+    (day: Date) => {
+      if (!interactive || isBefore(day, today)) return;
+      const key = dateKey(day);
+      dragRef.current = { start: key, dragging: false };
+      setSelection([key]);
+      setPopupOpen(false);
+    },
+    [interactive, today]
+  );
 
-  function handleDayMouseEnter(day: Date) {
-    if (!interactive || !dragRef.current || isBefore(day, today)) return;
-    dragRef.current.dragging = true;
-    setSelection(rangeBetween(dragRef.current.start, dateKey(day)));
-  }
+  const handleEnter = useCallback(
+    (day: Date) => {
+      if (!interactive || !dragRef.current || isBefore(day, today)) return;
+      dragRef.current.dragging = true;
+      setSelection(rangeBetween(dragRef.current.start, dateKey(day)));
+    },
+    [interactive, today]
+  );
 
-  function handleDayMouseUp(day: Date) {
-    if (!interactive || !dragRef.current) return;
-    const drag = dragRef.current;
-    dragRef.current = null;
-    if (isBefore(day, today)) {
-      setSelection(null);
-      return;
-    }
+  const handleUp = useCallback(
+    (day: Date) => {
+      if (!interactive || !dragRef.current) return;
+      const drag = dragRef.current;
+      dragRef.current = null;
+      if (isBefore(day, today)) {
+        setSelection(null);
+        return;
+      }
 
-    const key = dateKey(day);
-
-    if (!drag.dragging) {
-      if (mode === "host") {
+      const key = dateKey(day);
+      if (!drag.dragging && mode === "host") {
         const current = statusMap[key]?.status;
         if (current === "booked") {
+          toast.error("Booked dates can only be changed by admin");
           setSelection(null);
           return;
         }
         const next: AvailabilityStatus =
           current === "available" ? "blocked" : "available";
         applyChange([key], next, null);
+      } else {
+        // Admin mode (any click), or host drag → open popup now
+        setPopupOpen(true);
       }
-      // admin: keep popup open with the single selected date
-    }
-    // drag finished -> popup stays open with the range already in `selection`
-  }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [interactive, today, mode, statusMap]
+  );
 
   return (
-    <div className="availability-calendar">
+    <div>
       <CalendarStyles />
 
-      <DayPicker
-        numberOfMonths={3}
-        startMonth={startOfMonth(today)}
-        endMonth={addMonths(startOfMonth(today), 2)}
-        modifiers={
-          hasData ? { available, booked, blocked } : undefined
-        }
-        modifiersClassNames={
-          hasData
-            ? {
-                available: "rdp-available",
-                booked: "rdp-booked",
-                blocked: "rdp-blocked",
-              }
-            : undefined
-        }
-        disabled={{ before: today }}
-        showOutsideDays={false}
-        components={
-          interactive
-            ? {
-                DayButton: (props) => (
-                  <InteractiveDayButton
-                    {...props}
-                    onDown={handleDayMouseDown}
-                    onEnter={handleDayMouseEnter}
-                    onUp={handleDayMouseUp}
-                  />
-                ),
-              }
-            : undefined
-        }
-      />
-
-      {hasData && (
-        <Legend showBooked={mode !== "readonly" || booked.length > 0} />
+      {/* Stat badges */}
+      {interactive && hasData && (
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+            marginBottom: "24px",
+            flexWrap: "wrap",
+          }}
+        >
+          <StatBadge count={counts.available} label="Available" color="#16a34a" bg="#dcfce7" />
+          {(mode === "admin" || counts.booked > 0) && (
+            <StatBadge count={counts.booked} label="Booked" color="#dc2626" bg="#fee2e2" />
+          )}
+          <StatBadge count={counts.blocked} label="Blocked" color="#6b7280" bg="#f3f4f6" />
+        </div>
       )}
 
+      {/* Calendar */}
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: "16px",
+          border: "1px solid var(--border-light, #ebebeb)",
+          padding: "24px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+          overflowX: "auto",
+        }}
+      >
+        <DayPicker
+          numberOfMonths={3}
+          startMonth={startOfMonth(today)}
+          endMonth={addMonths(startOfMonth(today), 2)}
+          disabled={{ before: today }}
+          showOutsideDays={false}
+          modifiers={{
+            available: availableDates,
+            booked: bookedDates,
+            blocked: blockedDates,
+            selected: selectedDates,
+          }}
+          modifiersStyles={{
+            available: {
+              backgroundColor: "#dcfce7",
+              color: "#15803d",
+              fontWeight: 600,
+              borderRadius: "10px",
+            },
+            booked: {
+              backgroundColor: "#fee2e2",
+              color: "#b91c1c",
+              fontWeight: 600,
+              borderRadius: "10px",
+            },
+            blocked: {
+              backgroundColor: "#f3f4f6",
+              color: "#6b7280",
+              borderRadius: "10px",
+            },
+            selected: {
+              outline: "2.5px solid var(--accent, #c4582a)",
+              outlineOffset: "-2px",
+              borderRadius: "10px",
+              boxShadow: "0 0 0 3px var(--accent-light, #fef4f0)",
+            },
+          }}
+          components={
+            interactive
+              ? {
+                  Day: (props) => (
+                    <InteractiveDay
+                      {...props}
+                      onDown={handleDown}
+                      onEnter={handleEnter}
+                      onUp={handleUp}
+                    />
+                  ),
+                }
+              : undefined
+          }
+        />
+      </div>
+
+      {/* Legend */}
+      {(hasData || mode !== "readonly") && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "20px",
+            marginTop: "20px",
+            padding: "12px 16px",
+            background: "var(--surface, #f7f7f7)",
+            borderRadius: "12px",
+          }}
+        >
+          <LegendDot color="#dcfce7" border="#86efac" label="Available" />
+          {(mode !== "readonly" || bookedDates.length > 0) && (
+            <LegendDot color="#fee2e2" border="#fca5a5" label="Booked" />
+          )}
+          <LegendDot color="#f3f4f6" border="#d1d5db" label="Blocked" />
+        </div>
+      )}
+
+      {/* Hint */}
       {!hasData && mode === "readonly" && (
-        <p className="text-sm text-[var(--muted)] mt-3">
+        <p style={{ fontSize: "14px", color: "var(--muted)", marginTop: "16px" }}>
           Contact us to check availability for your preferred dates.
         </p>
       )}
 
       {interactive && (
-        <p className="text-sm text-[var(--muted)] mt-3">
+        <p style={{ fontSize: "13px", color: "var(--muted)", marginTop: "16px", lineHeight: 1.5 }}>
           {mode === "host"
-            ? "Click a date to toggle it between available and blocked, or click and drag to select a range."
-            : "Click a date, or click and drag to select a range, then set its status and an optional note."}
+            ? "Click a date to toggle available ↔ blocked, or drag to select a range. Booked dates (set by admin) cannot be changed."
+            : "Click a date or drag to select a range, then choose a status and optional note."}
         </p>
       )}
 
-      {interactive && selection && selection.length > 0 && (
+      {/* Saving spinner */}
+      {isPending && (
+        <div
+          style={{
+            marginTop: "12px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "13px",
+            color: "var(--muted)",
+          }}
+        >
+          <span className="avail-spinner" />
+          Saving…
+        </div>
+      )}
+
+      {/* Selection popup */}
+      {interactive && popupOpen && selection && selection.length > 0 && (
         <SelectionPopup
           dates={selection}
           mode={mode as "host" | "admin"}
           existingNote={statusMap[selection[0]]?.note ?? null}
-          onCancel={() => setSelection(null)}
+          onCancel={() => {
+            setSelection(null);
+            setPopupOpen(false);
+          }}
           onConfirm={applyChange}
         />
       )}
@@ -226,23 +349,23 @@ export default function AvailabilityCalendar({
   );
 }
 
-// ─── Interactive day button ─────────────────────────────────
+/* ─── Interactive Day cell (wraps the whole <td>) ──────────── */
 
-function InteractiveDayButton({
+function InteractiveDay({
   day,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- excluded from `...rest` (not a valid <button> attr)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   modifiers,
   onDown,
   onEnter,
   onUp,
   ...rest
-}: DayButtonProps & {
+}: DayProps & {
   onDown: (d: Date) => void;
   onEnter: (d: Date) => void;
   onUp: (d: Date) => void;
 }) {
   return (
-    <button
+    <td
       {...rest}
       onMouseDown={(e) => {
         e.preventDefault();
@@ -250,11 +373,86 @@ function InteractiveDayButton({
       }}
       onMouseEnter={() => onEnter(day.date)}
       onMouseUp={() => onUp(day.date)}
+      onTouchStart={(e) => {
+        e.preventDefault();
+        onDown(day.date);
+      }}
+      onTouchEnd={() => onUp(day.date)}
     />
   );
 }
 
-// ─── Selection popup ────────────────────────────────────────
+/* ─── Stat badge ────────────────────────────────────────────── */
+
+function StatBadge({
+  count,
+  label,
+  color,
+  bg,
+}: {
+  count: number;
+  label: string;
+  color: string;
+  bg: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        padding: "10px 16px",
+        background: bg,
+        borderRadius: "12px",
+        minWidth: "100px",
+      }}
+    >
+      <span
+        style={{
+          fontSize: "22px",
+          fontWeight: 700,
+          color,
+          lineHeight: 1,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {count}
+      </span>
+      <span style={{ fontSize: "13px", color, fontWeight: 500 }}>{label}</span>
+    </div>
+  );
+}
+
+/* ─── Legend dot ─────────────────────────────────────────────── */
+
+function LegendDot({
+  color,
+  border,
+  label,
+}: {
+  color: string;
+  border: string;
+  label: string;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <span
+        style={{
+          width: "14px",
+          height: "14px",
+          borderRadius: "50%",
+          background: color,
+          border: `1.5px solid ${border}`,
+          display: "inline-block",
+          flexShrink: 0,
+        }}
+      />
+      <span style={{ fontSize: "13px", color: "var(--muted)" }}>{label}</span>
+    </div>
+  );
+}
+
+/* ─── Selection popup ───────────────────────────────────────── */
 
 function SelectionPopup({
   dates,
@@ -267,7 +465,11 @@ function SelectionPopup({
   mode: "host" | "admin";
   existingNote: string | null;
   onCancel: () => void;
-  onConfirm: (dates: string[], status: AvailabilityStatus, note: string | null) => void;
+  onConfirm: (
+    dates: string[],
+    status: AvailabilityStatus,
+    note: string | null
+  ) => void;
 }) {
   const [status, setStatus] = useState<AvailabilityStatus>("blocked");
   const [note, setNote] = useState(existingNote ?? "");
@@ -275,136 +477,319 @@ function SelectionPopup({
   const sorted = [...dates].sort();
   const label =
     sorted.length === 1
-      ? format(parseISO(sorted[0]), "MMM d, yyyy")
+      ? format(parseISO(sorted[0]), "EEEE, MMM d, yyyy")
       : `${format(parseISO(sorted[0]), "MMM d")} – ${format(
           parseISO(sorted[sorted.length - 1]),
           "MMM d, yyyy"
         )}`;
 
   return (
-    <div className="mt-4 max-w-sm rounded-xl border border-sand-200 bg-white p-4 shadow-sm">
-      <p className="mb-3 text-sm font-medium text-warm-900">{label}</p>
-      <p className="mb-3 text-xs text-warm-500">
-        {sorted.length} date{sorted.length !== 1 ? "s" : ""} selected
-      </p>
+    <>
+      <div
+        onClick={onCancel}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.15)",
+          zIndex: 40,
+          backdropFilter: "blur(2px)",
+        }}
+      />
 
-      {mode === "host" ? (
-        <div className="mb-3 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => onConfirm(dates, "blocked", note.trim() || null)}
-            className="h-9 rounded-lg border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
-          >
-            Mark as Blocked
-          </button>
-          <button
-            type="button"
-            onClick={() => onConfirm(dates, "available", note.trim() || null)}
-            className="h-9 rounded-lg border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
-          >
-            Mark as Available
-          </button>
-        </div>
-      ) : (
-        <div className="mb-3 flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-warm-700">Status</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as AvailabilityStatus)}
-            className="h-9 rounded-lg border border-sand-200 bg-white px-3 text-sm text-warm-900 outline-none focus:border-sea-400 focus:ring-2 focus:ring-sea-100"
-          >
-            <option value="available">Available</option>
-            <option value="booked">Booked</option>
-            <option value="blocked">Blocked</option>
-          </select>
-        </div>
-      )}
+      <div
+        style={{
+          position: "fixed",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 50,
+          width: "100%",
+          maxWidth: "400px",
+          background: "#fff",
+          borderRadius: "20px",
+          padding: "28px",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)",
+          animation: "avail-popup-in 0.2s ease-out",
+        }}
+      >
+        <p style={{ fontSize: "17px", fontWeight: 600, color: "var(--foreground, #1a1a1a)" }}>
+          {label}
+        </p>
+        <p style={{ fontSize: "13px", color: "var(--muted)", marginTop: "4px" }}>
+          {sorted.length} date{sorted.length !== 1 ? "s" : ""} selected
+        </p>
 
-      <div className="mb-4 flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-warm-700">
-          Note (optional)
-        </label>
-        <input
-          type="text"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="e.g. Booked by Ahmad, 4 guests"
-          className="h-9 rounded-lg border border-sand-200 bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-sea-400 focus:ring-2 focus:ring-sea-100"
-        />
-      </div>
+        <div style={{ height: "1px", background: "var(--border-light, #ebebeb)", margin: "16px 0" }} />
 
-      <div className="flex gap-2">
-        {mode === "admin" && (
-          <button
-            type="button"
-            onClick={() => onConfirm(dates, status, note.trim() || null)}
-            className="h-9 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:opacity-90"
-          >
-            Confirm
-          </button>
+        {mode === "host" ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <PopupActionButton
+              label="Mark as Available"
+              dotColor="#22c55e"
+              borderColor="#86efac"
+              bgColor="#f0fdf4"
+              bgHover="#dcfce7"
+              textColor="#166534"
+              onClick={() => onConfirm(dates, "available", note.trim() || null)}
+            />
+            <PopupActionButton
+              label="Mark as Blocked"
+              dotColor="#9ca3af"
+              borderColor="#d1d5db"
+              bgColor="#f9fafb"
+              bgHover="#f3f4f6"
+              textColor="#374151"
+              onClick={() => onConfirm(dates, "blocked", note.trim() || null)}
+            />
+          </div>
+        ) : (
+          <div style={{ marginBottom: "16px" }}>
+            <label style={labelStyle}>Status</label>
+            <div style={{ display: "flex", gap: "8px" }}>
+              {([
+                { value: "available" as const, label: "Available", color: "#16a34a", bg: "#f0fdf4", border: "#86efac" },
+                { value: "booked" as const, label: "Booked", color: "#dc2626", bg: "#fef2f2", border: "#fca5a5" },
+                { value: "blocked" as const, label: "Blocked", color: "#6b7280", bg: "#f9fafb", border: "#d1d5db" },
+              ]).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setStatus(opt.value)}
+                  style={{
+                    flex: 1,
+                    padding: "10px 8px",
+                    borderRadius: "12px",
+                    border: `2px solid ${status === opt.value ? opt.color : opt.border}`,
+                    background: status === opt.value ? opt.bg : "transparent",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: status === opt.value ? 700 : 500,
+                    color: opt.color,
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
-        <button
-          type="button"
-          onClick={onCancel}
-          className="h-9 rounded-lg border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-}
 
-// ─── Legend ─────────────────────────────────────────────────
-
-function Legend({ showBooked }: { showBooked: boolean }) {
-  return (
-    <div className="flex flex-wrap gap-4 mt-4 text-sm">
-      <div className="flex items-center gap-2">
-        <span className="w-4 h-4 rounded-full bg-[#dcfce7] border border-[#86efac] inline-block" />
-        <span className="text-[var(--muted)]">Available</span>
-      </div>
-      {showBooked && (
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-[#fee2e2] border border-[#fca5a5] inline-block" />
-          <span className="text-[var(--muted)]">Booked</span>
+        <div style={{ marginTop: mode === "host" ? "16px" : "0" }}>
+          <label style={labelStyle}>Note (optional)</label>
+          <input
+            type="text"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="e.g. Booked by Ahmad, 4 guests"
+            style={{
+              width: "100%",
+              height: "44px",
+              borderRadius: "12px",
+              border: "1.5px solid var(--border, #ddd)",
+              background: "#fff",
+              padding: "0 14px",
+              fontSize: "14px",
+              color: "var(--foreground)",
+              outline: "none",
+              transition: "border-color 0.15s",
+              boxSizing: "border-box",
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border, #ddd)")}
+          />
         </div>
-      )}
-      <div className="flex items-center gap-2">
-        <span className="w-4 h-4 rounded-full bg-[#f3f4f6] border border-[#d1d5db] inline-block" />
-        <span className="text-[var(--muted)]">Blocked</span>
+
+        <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+          {mode === "admin" && (
+            <button
+              type="button"
+              onClick={() => onConfirm(dates, status, note.trim() || null)}
+              style={{
+                flex: 1,
+                height: "44px",
+                borderRadius: "12px",
+                background: "var(--accent)",
+                color: "#fff",
+                fontSize: "14px",
+                fontWeight: 600,
+                border: "none",
+                cursor: "pointer",
+                transition: "opacity 0.15s",
+              }}
+            >
+              Confirm
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              flex: mode === "admin" ? "none" : 1,
+              height: "44px",
+              borderRadius: "12px",
+              background: "transparent",
+              color: "var(--muted)",
+              fontSize: "14px",
+              fontWeight: 500,
+              border: "1.5px solid var(--border, #ddd)",
+              cursor: "pointer",
+              padding: "0 20px",
+              transition: "background 0.15s",
+            }}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────────
+function PopupActionButton({
+  label,
+  dotColor,
+  borderColor,
+  bgColor,
+  bgHover,
+  textColor,
+  onClick,
+}: {
+  label: string;
+  dotColor: string;
+  borderColor: string;
+  bgColor: string;
+  bgHover: string;
+  textColor: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        padding: "14px 16px",
+        borderRadius: "14px",
+        border: `1.5px solid ${borderColor}`,
+        background: bgColor,
+        cursor: "pointer",
+        fontSize: "14px",
+        fontWeight: 600,
+        color: textColor,
+        transition: "all 0.15s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = bgHover;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = bgColor;
+      }}
+    >
+      <span
+        style={{
+          width: "10px",
+          height: "10px",
+          borderRadius: "50%",
+          background: dotColor,
+          flexShrink: 0,
+        }}
+      />
+      {label}
+    </button>
+  );
+}
+
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  fontSize: "12px",
+  fontWeight: 600,
+  color: "var(--muted)",
+  marginBottom: "8px",
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+};
+
+/* ─── Styles ────────────────────────────────────────────────── */
 
 function CalendarStyles() {
   return (
     <style>{`
-      .availability-calendar .rdp-root {
+      @keyframes avail-popup-in {
+        from { opacity: 0; transform: translate(-50%, -48%); }
+        to   { opacity: 1; transform: translate(-50%, -50%); }
+      }
+      @keyframes avail-spin {
+        to { transform: rotate(360deg); }
+      }
+      .avail-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--border-light, #ebebeb);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: avail-spin 0.6s linear infinite;
+      }
+      .rdp-root {
         --rdp-accent-color: var(--accent);
         --rdp-accent-background-color: var(--accent-light);
+        --rdp-day-height: 42px;
+        --rdp-day-width: 42px;
+        font-family: inherit;
+        max-width: 100%;
       }
-      .availability-calendar .rdp-day_button {
-        border-radius: 50%;
-        font-size: 13px;
+      .rdp-months {
+        gap: 32px;
+        flex-wrap: wrap;
+        justify-content: center;
       }
-      .availability-calendar .rdp-available .rdp-day_button {
-        background-color: #dcfce7;
-        color: #166534;
+      .rdp-month_caption {
+        padding: 0 0 12px 4px;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--foreground, #1a1a1a);
       }
-      .availability-calendar .rdp-booked .rdp-day_button {
-        background-color: #fee2e2;
-        color: #991b1b;
+      .rdp-weekday {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted, #717171);
       }
-      .availability-calendar .rdp-blocked .rdp-day_button {
-        background-color: #f3f4f6;
-        color: #9ca3af;
+      .rdp-day {
+        cursor: pointer;
+        transition: transform 0.12s ease;
       }
-      .availability-calendar .rdp-months {
-        gap: 1.5rem;
+      .rdp-day:hover {
+        transform: scale(1.06);
+      }
+      .rdp-day.rdp-disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
+      }
+      .rdp-day.rdp-disabled:hover {
+        transform: none;
+      }
+      .rdp-button_previous,
+      .rdp-button_next {
+        border-radius: 10px;
+        transition: background 0.15s;
+      }
+      .rdp-button_previous:hover,
+      .rdp-button_next:hover {
+        background: var(--surface, #f7f7f7);
+      }
+      @media (max-width: 768px) {
+        .rdp-root {
+          --rdp-day-height: 38px;
+          --rdp-day-width: 38px;
+        }
+        .rdp-months {
+          gap: 24px;
+        }
       }
     `}</style>
   );

@@ -2,8 +2,6 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
-import { Container } from "@/components/ui";
 
 export default function ChaletDetailError({
   error,
@@ -17,33 +15,49 @@ export default function ChaletDetailError({
   }, [error]);
 
   return (
-    <>
-      <Header />
-      <main className="flex-1 flex items-center">
-        <Container className="py-24 text-center">
-          <p className="text-5xl mb-4">😔</p>
-          <h1 className="text-2xl font-semibold mb-2">Something went wrong</h1>
-          <p className="text-[var(--muted)] mb-8 max-w-sm mx-auto">
-            We couldn&apos;t load this listing. Please try again or browse other
-            available chalets.
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={reset}
-              className="px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-xl text-sm font-semibold transition-colors"
-            >
-              Try again
-            </button>
-            <Link
-              href="/chalets"
-              className="px-5 py-2.5 border border-[var(--border)] hover:bg-[var(--surface)] rounded-xl text-sm font-semibold transition-colors"
-            >
-              Browse all chalets
-            </Link>
-          </div>
-        </Container>
-      </main>
-      <Footer />
-    </>
+    <main className="flex-1 flex items-center justify-center min-h-screen">
+      <div className="py-24 text-center px-4">
+        <p className="text-5xl mb-4">😔</p>
+        <h1 className="text-2xl font-semibold mb-2">Something went wrong</h1>
+        <p
+          style={{ color: "var(--muted)", maxWidth: "320px", margin: "0 auto 32px" }}
+          className="text-sm"
+        >
+          We couldn&apos;t load this listing. Please try again or browse other
+          available chalets.
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={reset}
+            style={{
+              backgroundColor: "var(--accent)",
+              color: "#fff",
+              padding: "10px 20px",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontWeight: 600,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Try again
+          </button>
+          <Link
+            href="/"
+            style={{
+              padding: "10px 20px",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontWeight: 600,
+              border: "1.5px solid var(--border)",
+              textDecoration: "none",
+              color: "var(--foreground)",
+            }}
+          >
+            Go home
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }

@@ -254,6 +254,7 @@ export default async function ChaletDetailPage(
                   maxGuests={listing.max_guests}
                   title={listing.title}
                   slug={listing.slug}
+                  availability={availability}
                 />
               </div>
             </div>
@@ -266,6 +267,7 @@ export default async function ChaletDetailPage(
           maxGuests={listing.max_guests}
           title={listing.title}
           slug={listing.slug}
+          availability={availability}
         />
       </main>
       <Footer />
