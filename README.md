@@ -29,10 +29,19 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploying to Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push this repo to GitHub and [import it into Vercel](https://vercel.com/new).
+2. In the Vercel project's **Settings → Environment Variables**, add the variables listed in [`.env.example`](.env.example):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# Manzeli" 
-"# Manzeli" 
+   | Variable | Where to find it | Exposed to browser? |
+   | --- | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API | Yes |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API | Yes |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API (service_role secret) | **No — server only** |
+   | `NEXT_PUBLIC_SITE_URL` | Your production URL, e.g. `https://manzeli.vercel.app` | Yes |
+
+   Variables prefixed `NEXT_PUBLIC_` are bundled into client code; everything else (like the service role key, used in `app/_actions/admin.ts` to create host accounts) stays server-side only.
+3. Deploy. Vercel runs `next build` automatically — to verify locally first, run `npm run build`.
+4. Once live, confirm `/sitemap.xml`, `/robots.txt`, and a listing's `/chalets/[slug]/opengraph-image` render correctly with `NEXT_PUBLIC_SITE_URL` pointing at your production domain.
+

@@ -1,4 +1,5 @@
 import { Listing } from "@/lib/types";
+import { AMENITY_FILTER_KEYS, type AmenityFilterKey } from "@/lib/constants";
 import type {
   Listing as DbListing,
   ListingImage,
@@ -60,6 +61,110 @@ export async function getListingBySlug(slug: string): Promise<Listing | null> {
     .single();
   if (error) { console.error("[getListingBySlug]", error.message); return null; }
   return toListing(data as DbListing & { listing_images: ImageRow[] });
+}
+
+// ─── Browse filters ─────────────────────────────────────────
+
+export type ListingFilters = {
+  amenities?: AmenityFilterKey[];
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number; // 4 means "4+"
+  maxGuests?: number;
+};
+
+export async function getFilteredListings(
+  filters: ListingFilters
+): Promise<Listing[]> {
+  if (!isSupabaseConfigured) return [];
+  const supabase = await getSupabase();
+
+  let query = supabase
+    .from("listings")
+    .select("*, listing_images(url, display_order)")
+    .eq("is_active", true);
+
+  for (const key of filters.amenities ?? []) {
+    if (AMENITY_FILTER_KEYS.includes(key)) query = query.eq(key, true);
+  }
+  if (filters.minPrice !== undefined) query = query.gte("price", filters.minPrice);
+  if (filters.maxPrice !== undefined) query = query.lte("price", filters.maxPrice);
+  if (filters.bedrooms !== undefined) {
+    query =
+      filters.bedrooms >= 4
+        ? query.gte("bedrooms", 4)
+        : query.eq("bedrooms", filters.bedrooms);
+  }
+  if (filters.maxGuests !== undefined) query = query.gte("max_guests", filters.maxGuests);
+
+  query = query.order("created_at", { ascending: false });
+
+  const { data, error } = await query;
+  if (error) { console.error("[getFilteredListings]", error.message); return []; }
+  return (data ?? []).map((row) => toListing(row as DbListing & { listing_images: ImageRow[] }));
+}
+
+export async function getActiveSlugs(): Promise<{ slug: string; updated_at: string }[]> {
+  if (!isSupabaseConfigured) return [];
+  const supabase = await getSupabase();
+  const { data, error } = await supabase
+    .from("listings")
+    .select("slug, updated_at")
+    .eq("is_active", true);
+
+  if (error) { console.error("[getActiveSlugs]", error.message); return []; }
+  return (data ?? []) as { slug: string; updated_at: string }[];
+}
+
+export type HostListing = DbListing & { cover_image: string | null };
+
+export async function getHostListings(hostId: string): Promise<HostListing[]> {
+  if (!isSupabaseConfigured) return [];
+  const supabase = await getSupabase();
+  const { data, error } = await supabase
+    .from("listings")
+    .select("*, listing_images(url, display_order)")
+    .eq("host_id", hostId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[getHostListings]", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((row) => {
+    const listing = row as DbListing & { listing_images?: ImageRow[] };
+    const images = (listing.listing_images ?? []).sort(
+      (a, b) => a.display_order - b.display_order
+    );
+    return { ...listing, cover_image: images[0]?.url ?? null };
+  });
+}
+
+export async function getListingAvailabilityWindow(
+  listingId: string
+): Promise<Availability[]> {
+  if (!isSupabaseConfigured) return [];
+  const supabase = await getSupabase();
+
+  const from = new Date();
+  from.setDate(1);
+  const to = new Date(from);
+  to.setMonth(to.getMonth() + 3);
+
+  const { data, error } = await supabase
+    .from("availability")
+    .select("*")
+    .eq("listing_id", listingId)
+    .gte("date", from.toISOString().slice(0, 10))
+    .lte("date", to.toISOString().slice(0, 10));
+
+  if (error) {
+    console.error("[getListingAvailabilityWindow]", error.message);
+    return [];
+  }
+
+  return (data ?? []) as Availability[];
 }
 
 export async function getListingFull(slug: string): Promise<ListingPageData | null> {

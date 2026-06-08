@@ -51,7 +51,7 @@ export default async function ChaletDetailPage(
 
   if (!data || !data.listing.is_active) notFound();
 
-  const { listing, images, rooms, availability, host } = data;
+  const { listing, images, rooms, availability } = data;
 
   const amenities: { key: keyof typeof AMENITY_MAP; label: string }[] = (
     Object.keys(AMENITY_MAP) as (keyof typeof AMENITY_MAP)[]
@@ -206,7 +206,11 @@ export default async function ChaletDetailPage(
                     ? "Select your dates to see pricing."
                     : "Contact us to confirm your preferred dates."}
                 </p>
-                <AvailabilityCalendar availability={availability} />
+                <AvailabilityCalendar
+                  listingId={listing.id}
+                  initialAvailability={availability}
+                  mode="readonly"
+                />
               </section>
 
               {/* ── Google Maps ── */}

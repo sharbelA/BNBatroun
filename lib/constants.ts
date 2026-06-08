@@ -32,6 +32,33 @@ export const AMENITIES: Record<string, { label: string; emoji: string }> = {
   hiking: { label: "Hiking", emoji: "🥾" },
 };
 
+// ─── Browse filter amenities ────────────────────────────────
+// Maps to boolean columns on the `listings` table — used by the
+// chalets browse page filter pills (client-safe, no Supabase imports).
+export const AMENITY_FILTER_KEYS = [
+  "pet_friendly",
+  "pool",
+  "sea_view",
+  "mountain_view",
+  "wifi",
+  "parking",
+  "ac",
+  "bbq",
+] as const;
+
+export type AmenityFilterKey = (typeof AMENITY_FILTER_KEYS)[number];
+
+export const AMENITY_FILTER_LABELS: Record<AmenityFilterKey, string> = {
+  pet_friendly: "Pet Friendly",
+  pool: "Pool",
+  sea_view: "Sea View",
+  mountain_view: "Mountain View",
+  wifi: "WiFi",
+  parking: "Parking",
+  ac: "AC",
+  bbq: "BBQ",
+};
+
 // ─── Site config ────────────────────────────────────────────
 export const SITE = {
   name: "Manzeli",

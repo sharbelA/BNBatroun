@@ -1,42 +1,81 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Header, Footer } from "@/components/layout";
+import { Container } from "@/components/ui";
+import { getFilteredListings } from "@/lib/supabase/queries/listings";
+import { AMENITY_FILTER_KEYS, type AmenityFilterKey } from "@/lib/constants";
+import ListingGrid from "@/components/listing/ListingGrid";
+import Filters from "./_components/Filters";
 
-export const metadata: Metadata = { title: 'Browse chalets' }
+export const metadata: Metadata = { title: "Browse chalets" };
+
+function parseAmenities(value: string | string[] | undefined): AmenityFilterKey[] {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .filter((key): key is AmenityFilterKey =>
+      (AMENITY_FILTER_KEYS as readonly string[]).includes(key)
+    );
+}
+
+function parseNumber(value: string | string[] | undefined): number | undefined {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : undefined;
+}
 
 export default async function ChaletsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const filters = await searchParams
+  const params = await searchParams;
+
+  const filters = {
+    amenities: parseAmenities(params.amenities),
+    minPrice: parseNumber(params.minPrice),
+    maxPrice: parseNumber(params.maxPrice),
+    bedrooms: parseNumber(params.bedrooms),
+    maxGuests: parseNumber(params.maxGuests),
+  };
+
+  const listings = await getFilteredListings(filters);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-12 md:px-6 md:py-16">
-      <h1 className="mb-8 text-3xl font-semibold text-warm-900">
-        Chalets in Batroun
-      </h1>
+    <>
+      <Header />
+      <main className="flex-1">
+        <Container className="py-12 md:py-16">
+          <h1 className="mb-8 text-3xl font-semibold text-warm-900">
+            Chalets in Batroun
+          </h1>
 
-      {/* Filters */}
-      <div className="mb-10 flex flex-wrap gap-3">
-        <select className="h-9 rounded-lg border border-sand-200 bg-white px-3 text-sm text-warm-700">
-          <option value="">Any location</option>
-        </select>
-        <select className="h-9 rounded-lg border border-sand-200 bg-white px-3 text-sm text-warm-700">
-          <option value="">Any guests</option>
-        </select>
-      </div>
+          <Filters resultCount={listings.length} />
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <p className="col-span-full text-sm text-warm-400">
-          Chalet cards will appear here.
-        </p>
-      </div>
+          <p className="mb-6 hidden text-sm text-warm-500 md:block">
+            {listings.length} chalet{listings.length !== 1 ? "s" : ""} available
+          </p>
 
-      {process.env.NODE_ENV === 'development' && Object.keys(filters).length > 0 && (
-        <pre className="mt-8 rounded-lg bg-sand-100 p-4 text-xs text-warm-700">
-          {JSON.stringify(filters, null, 2)}
-        </pre>
-      )}
-    </main>
-  )
+          {listings.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-sand-200 bg-white py-20 text-center">
+              <p className="text-sm font-medium text-warm-700">
+                No chalets match your filters.
+              </p>
+              <Link
+                href="/chalets"
+                className="text-sm font-medium text-sea-600 hover:underline"
+              >
+                Reset filters
+              </Link>
+            </div>
+          ) : (
+            <ListingGrid listings={listings} title="" />
+          )}
+        </Container>
+      </main>
+      <Footer />
+    </>
+  );
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { Container } from "@/components/ui";
 
-export default function ChaletDetailError({
+export default function ChaletsError({
   error,
   reset,
 }: {
@@ -24,8 +24,7 @@ export default function ChaletDetailError({
           <p className="text-5xl mb-4">😔</p>
           <h1 className="text-2xl font-semibold mb-2">Something went wrong</h1>
           <p className="text-[var(--muted)] mb-8 max-w-sm mx-auto">
-            We couldn&apos;t load this listing. Please try again or browse other
-            available chalets.
+            We couldn&apos;t load chalets right now. Please try again.
           </p>
           <div className="flex items-center justify-center gap-3">
             <button
@@ -35,10 +34,10 @@ export default function ChaletDetailError({
               Try again
             </button>
             <Link
-              href="/chalets"
+              href="/"
               className="px-5 py-2.5 border border-[var(--border)] hover:bg-[var(--surface)] rounded-xl text-sm font-semibold transition-colors"
             >
-              Browse all chalets
+              Back home
             </Link>
           </div>
         </Container>

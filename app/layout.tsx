@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Manzeli — Chalets & Vacation Rentals in Lebanon",
+  title: "Manzeli — Chalets in Batroun, Lebanon",
   description:
-    "Find and book the best chalets, villas, and vacation homes across Lebanon. From Batroun beachfront to mountain retreats.",
+    "Discover and book unique chalets in Batroun. Local, trusted, community-driven.",
+  openGraph: {
+    title: "Manzeli — Chalets in Batroun, Lebanon",
+    description:
+      "Discover and book unique chalets in Batroun. Local, trusted, community-driven.",
+    siteName: "Manzeli",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -14,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Toaster position="top-center" richColors />
+      </body>
     </html>
   );
 }

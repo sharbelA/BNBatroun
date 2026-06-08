@@ -112,6 +112,12 @@ export default async function AdminListingsPage() {
                         Photos
                       </Link>
                       <Link
+                        href={`/admin/listings/${listing.id}/availability`}
+                        className="text-sea-600 hover:underline"
+                      >
+                        Availability
+                      </Link>
+                      <Link
                         href={`/chalets/${listing.slug}`}
                         target="_blank"
                         className="text-warm-400 hover:text-warm-600"

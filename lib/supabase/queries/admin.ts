@@ -67,3 +67,28 @@ export async function getHosts(): Promise<
 
   return (data ?? []) as Pick<Profile, "id" | "name">[];
 }
+
+export type HostWithListingCount = Profile & { listing_count: number };
+
+export async function getHostsWithListingCounts(): Promise<
+  HostWithListingCount[]
+> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*, listings(count)")
+    .eq("role", "host")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[getHostsWithListingCounts]", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((row: Record<string, unknown>) => ({
+    ...(row as Profile),
+    listing_count:
+      (row.listings as { count: number }[] | null)?.[0]?.count ?? 0,
+  }));
+}
