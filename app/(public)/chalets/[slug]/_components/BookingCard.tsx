@@ -166,13 +166,13 @@ export default function BookingCard({
   return (
     <div
       ref={cardRef}
-      className="bg-white rounded-2xl border border-[var(--border)] shadow-[0_4px_24px_rgba(0,0,0,0.10)] p-6"
+      className="bg-white booking-card p-6"
     >
       <style>{CALENDAR_CSS}</style>
 
       {/* ── Price ── */}
       <div className="pb-4 mb-4 border-b border-[var(--border-light)]">
-        <span className="text-2xl font-bold">${price.toLocaleString()}</span>
+        <span className="text-2xl font-bold text-[var(--accent)]">${price.toLocaleString()}</span>
         <span className="text-[var(--muted)] text-sm ml-1">/ night</span>
       </div>
 

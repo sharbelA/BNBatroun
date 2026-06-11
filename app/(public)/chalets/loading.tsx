@@ -5,7 +5,7 @@ export default function ChaletsLoading() {
   return (
     <>
       <Header />
-      <main className="flex-1 animate-pulse">
+      <main className="flex-1 shimmer">
         <Container className="py-12 md:py-16">
           <div className="mb-8 h-9 w-64 rounded bg-gray-200" />
           <div className="mb-10 h-48 rounded-2xl border border-gray-100 bg-gray-50" />

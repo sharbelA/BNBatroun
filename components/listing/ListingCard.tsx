@@ -18,10 +18,12 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   const images = listing.images ?? [];
 
   return (
-    <Link href={`/chalets/${listing.slug}`} className="group block">
-      <div className="relative">
+    <Link href={`/chalets/${listing.slug}`} className="group block card-hover">
+      <div className="relative overflow-hidden rounded-xl">
         {images.length > 0 ? (
-          <ImageCarousel images={images} alt={listing.title} />
+          <div className="img-zoom">
+            <ImageCarousel images={images} alt={listing.title} />
+          </div>
         ) : (
           <div className="relative aspect-[20/19] overflow-hidden rounded-xl bg-gradient-to-br from-[var(--surface)] to-[#ede4d8] flex flex-col items-center justify-center gap-2">
             <Icon name="home" size={36} stroke="var(--muted)" strokeWidth={1.5} fill="none" />
@@ -56,7 +58,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
           {listing.max_guests} guest{listing.max_guests !== 1 ? "s" : ""}
         </p>
         <p className="mt-1.5">
-          <span className="text-[15px] font-semibold">
+          <span className="text-[15px] font-semibold text-[var(--accent)]">
             {SITE.currencySymbol}
             {listing.price}
           </span>{" "}

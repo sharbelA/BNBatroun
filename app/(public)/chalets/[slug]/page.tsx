@@ -165,8 +165,8 @@ export default async function ChaletDetailPage(
                       {amenities.map(({ key, label }) => {
                         const { icon } = AMENITY_MAP[key];
                         return (
-                          <div key={key} className="flex items-center gap-3">
-                            <span className="text-[var(--foreground)]">
+                          <div key={key} className="flex items-center gap-3 rounded-xl bg-sand-50 px-3 py-2.5">
+                            <span className="text-[var(--accent)]">
                               <Icon name={icon as Parameters<typeof Icon>[0]["name"]} size={20} />
                             </span>
                             <span className="text-sm">{label}</span>

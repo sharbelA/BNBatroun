@@ -35,7 +35,7 @@ export default async function ReviewSection({
   return (
     <section>
       <div className="flex items-baseline gap-3 mb-5">
-        <h2 className="text-xl font-semibold">Reviews</h2>
+        <h2 className="text-xl font-semibold section-title">Reviews</h2>
         {avg !== null && (
           <span className="flex items-center gap-1.5 text-sm text-[var(--muted)]">
             <span className="text-amber-400">★</span>
@@ -46,11 +46,11 @@ export default async function ReviewSection({
       </div>
 
       {reviews.length > 0 ? (
-        <div className="space-y-5">
+        <div className="space-y-4">
           {reviews.map(review => (
             <div
               key={review.id}
-              className="border-b border-[var(--border-light)] pb-5 last:border-none last:pb-0"
+              className="rounded-xl border border-[var(--border-light)] bg-white p-5 transition-shadow hover:shadow-sm"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>

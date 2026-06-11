@@ -14,7 +14,7 @@ export default async function Header() {
   const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[var(--border-light)]">
+    <header className="sticky top-0 z-50 bg-white border-b border-[var(--border-light)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <Container>
         <div className="flex h-[var(--header-height)] items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">

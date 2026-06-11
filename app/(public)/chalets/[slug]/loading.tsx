@@ -10,10 +10,10 @@ export default function ChaletDetailLoading() {
           <Container>
             {/* Gallery skeleton */}
             <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-2 rounded-2xl overflow-hidden h-72 md:h-[440px]">
-              <div className="bg-[var(--surface)] animate-pulse" />
+              <div className="bg-[var(--surface)] shimmer" />
               <div className="hidden md:grid grid-rows-2 gap-2">
-                <div className="bg-[var(--surface)] animate-pulse" />
-                <div className="bg-[var(--surface)] animate-pulse" />
+                <div className="bg-[var(--surface)] shimmer" />
+                <div className="bg-[var(--surface)] shimmer" />
               </div>
             </div>
           </Container>
@@ -24,16 +24,16 @@ export default function ChaletDetailLoading() {
             <div className="flex-1 space-y-6">
               {/* Title skeleton */}
               <div className="space-y-3">
-                <div className="h-8 bg-[var(--surface)] rounded-lg w-3/4 animate-pulse" />
-                <div className="h-4 bg-[var(--surface)] rounded w-1/2 animate-pulse" />
+                <div className="h-8 bg-[var(--surface)] rounded-lg w-3/4 shimmer" />
+                <div className="h-4 bg-[var(--surface)] rounded w-1/2 shimmer" />
               </div>
               <hr className="border-[var(--border-light)]" />
               {/* Host skeleton */}
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[var(--surface)] animate-pulse" />
+                <div className="w-12 h-12 rounded-full bg-[var(--surface)] shimmer" />
                 <div className="space-y-2">
-                  <div className="h-4 bg-[var(--surface)] rounded w-32 animate-pulse" />
-                  <div className="h-3 bg-[var(--surface)] rounded w-48 animate-pulse" />
+                  <div className="h-4 bg-[var(--surface)] rounded w-32 shimmer" />
+                  <div className="h-3 bg-[var(--surface)] rounded w-48 shimmer" />
                 </div>
               </div>
               <hr className="border-[var(--border-light)]" />
@@ -42,7 +42,7 @@ export default function ChaletDetailLoading() {
                 {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="h-4 bg-[var(--surface)] rounded animate-pulse"
+                    className="h-4 bg-[var(--surface)] rounded shimmer"
                     style={{ width: `${85 - i * 10}%` }}
                   />
                 ))}
@@ -50,7 +50,7 @@ export default function ChaletDetailLoading() {
             </div>
             {/* Booking card skeleton */}
             <div className="hidden lg:block w-[360px] shrink-0">
-              <div className="h-96 bg-[var(--surface)] rounded-2xl animate-pulse" />
+              <div className="h-96 bg-[var(--surface)] rounded-2xl shimmer" />
             </div>
           </div>
         </Container>

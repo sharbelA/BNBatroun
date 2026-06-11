@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Header, Footer } from '@/components/layout'
+import { Container } from '@/components/ui'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -9,66 +11,111 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-16 md:px-6 md:py-24">
+    <>
+      <Header />
+      <main className="flex-1">
 
-      {/* Hero */}
-      <section className="mb-16 text-center">
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-warm-900">
-          About Manzeli
-        </h1>
-        <p className="mx-auto max-w-xl text-lg leading-relaxed text-warm-600">
-          A curated collection of chalets in Batroun, Lebanon — where the
-          mountains meet the Mediterranean.
-        </p>
-      </section>
+        {/* Hero */}
+        <section className="bg-gradient-to-br from-[#fdf6f0] via-white to-[var(--accent-light)] py-20 md:py-28">
+          <Container className="text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--accent-light)] text-[var(--accent)] text-xs font-semibold mb-6 tracking-wide uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+              Since 2025
+            </div>
+            <h1 className="mb-4 text-4xl md:text-5xl font-bold tracking-tight text-warm-900 animate-page-in"
+                style={{ fontFamily: 'var(--font-heading)' }}>
+              About Manzeli
+            </h1>
+            <p className="mx-auto max-w-xl text-lg leading-relaxed text-warm-500">
+              A curated collection of chalets in Batroun, Lebanon — where the
+              mountains meet the Mediterranean.
+            </p>
+          </Container>
+        </section>
 
-      {/* Story */}
-      <section className="mb-14 flex flex-col gap-5">
-        <h2 className="text-xl font-semibold text-warm-900">Our story</h2>
-        <p className="leading-relaxed text-warm-600">
-          Manzeli (منزلي — "my home" in Arabic) was built to connect travelers
-          with the best chalets in Batroun, North Lebanon. Every property is
-          hand-selected and verified to ensure an authentic, comfortable stay.
-        </p>
-        <p className="leading-relaxed text-warm-600">
-          Booking is simple and personal — all inquiries go directly to the
-          host via WhatsApp, keeping things human and fast.
-        </p>
-      </section>
+        {/* Story */}
+        <section className="py-16 md:py-20">
+          <Container>
+            <div className="mx-auto max-w-2xl">
+              <h2 className="text-xl font-semibold text-warm-900 mb-5 section-title">Our story</h2>
+              <p className="leading-relaxed text-warm-600 mb-4">
+                Manzeli (منزلي — &quot;my home&quot; in Arabic) was built to connect travelers
+                with the best chalets in Batroun, North Lebanon. Every property is
+                hand-selected and verified to ensure an authentic, comfortable stay.
+              </p>
+              <p className="leading-relaxed text-warm-600">
+                Booking is simple and personal — all inquiries go directly to the
+                host via WhatsApp, keeping things human and fast.
+              </p>
+            </div>
+          </Container>
+        </section>
 
-      {/* Batroun */}
-      <section className="mb-14 flex flex-col gap-5">
-        <h2 className="text-xl font-semibold text-warm-900">
-          Why Batroun?
-        </h2>
-        <p className="leading-relaxed text-warm-600">
-          One of the oldest cities in the world, Batroun sits on a rocky
-          peninsula jutting into the Mediterranean. It is famous for its
-          crystal-clear sea, Phoenician sea wall, vibrant restaurant scene,
-          and welcoming mountain villages just minutes from the coast.
-        </p>
-        <p className="leading-relaxed text-warm-600">
-          Whether you want a sea-view villa, a stone chalet in the pine
-          forests, or a poolside retreat, Batroun has it all — and Manzeli
-          helps you find it.
-        </p>
-      </section>
+        {/* Why Batroun — dark section */}
+        <section className="bg-warm-900 text-white py-16 md:py-20">
+          <Container>
+            <div className="mx-auto max-w-2xl">
+              <h2 className="text-xl font-semibold text-white mb-5">
+                Why Batroun?
+              </h2>
+              <p className="leading-relaxed text-warm-300 mb-4">
+                One of the oldest cities in the world, Batroun sits on a rocky
+                peninsula jutting into the Mediterranean. It is famous for its
+                crystal-clear sea, Phoenician sea wall, vibrant restaurant scene,
+                and welcoming mountain villages just minutes from the coast.
+              </p>
+              <p className="leading-relaxed text-warm-300">
+                Whether you want a sea-view villa, a stone chalet in the pine
+                forests, or a poolside retreat, Batroun has it all — and Manzeli
+                helps you find it.
+              </p>
+            </div>
+          </Container>
+        </section>
 
-      {/* Host CTA */}
-      <section className="rounded-2xl bg-sea-600 px-8 py-10 text-center text-white">
-        <h2 className="mb-2 text-xl font-semibold">Own a chalet in Batroun?</h2>
-        <p className="mb-6 text-sea-100">
-          List it on Manzeli and reach guests looking for exactly what you
-          offer.
-        </p>
-        <Link
-          href="/list-your-chalet"
-          className="inline-flex h-11 items-center rounded-xl bg-white px-6 text-sm font-semibold text-sea-700 transition hover:bg-sand-100"
-        >
-          List your chalet
-        </Link>
-      </section>
+        {/* Values */}
+        <section className="bg-sand-50 py-16 md:py-20">
+          <Container>
+            <div className="mx-auto max-w-3xl">
+              <h2 className="text-xl font-semibold text-warm-900 mb-10 text-center section-title" style={{ display: 'block', textAlign: 'center' }}>What makes us different</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[
+                  { icon: '✋', title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
+                  { icon: '💬', title: 'WhatsApp-first', desc: 'Book directly with hosts — no middlemen, no hidden fees.' },
+                  { icon: '📍', title: 'Batroun experts', desc: 'Local knowledge baked in — we know every beach, trail, and restaurant.' },
+                ].map(({ icon, title, desc }) => (
+                  <div key={title} className="text-center">
+                    <div className="text-3xl mb-3">{icon}</div>
+                    <h3 className="font-semibold text-warm-900 mb-2">{title}</h3>
+                    <p className="text-sm text-warm-500 leading-relaxed">{desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </section>
 
-    </main>
+        {/* Host CTA */}
+        <section className="py-16 md:py-20">
+          <Container>
+            <div className="mx-auto max-w-2xl rounded-2xl bg-[var(--accent)] px-8 py-12 text-center text-white">
+              <h2 className="mb-3 text-2xl font-semibold">Own a chalet in Batroun?</h2>
+              <p className="mb-6 text-white/80">
+                List it on Manzeli and reach guests looking for exactly what you
+                offer.
+              </p>
+              <Link
+                href="/list-your-chalet"
+                className="inline-flex h-11 items-center rounded-xl bg-white px-6 text-sm font-semibold text-[var(--accent)] transition hover:bg-sand-50"
+              >
+                List your chalet →
+              </Link>
+            </div>
+          </Container>
+        </section>
+
+      </main>
+      <Footer />
+    </>
   )
 }

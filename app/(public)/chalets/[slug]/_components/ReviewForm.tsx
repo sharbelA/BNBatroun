@@ -62,7 +62,7 @@ export default function ReviewForm({ listingId, listingSlug }: Props) {
               onClick={() => setRating(n)}
               onMouseEnter={() => setHovered(n)}
               onMouseLeave={() => setHovered(0)}
-              className={`text-2xl leading-none transition-colors ${
+              className={`text-2xl leading-none transition-colors star-btn ${
                 n <= (hovered || rating) ? 'text-amber-400' : 'text-sand-200'
               }`}
               aria-label={`${n} star${n !== 1 ? 's' : ''}`}

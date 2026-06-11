@@ -13,24 +13,28 @@ import ListingCard from "./ListingCard";
 interface ListingGridProps {
   listings: Listing[];
   title?: string;
+  bg?: "white" | "sand";
 }
 
 export default function ListingGrid({
   listings,
   title = "Stays across Lebanon",
+  bg = "white",
 }: ListingGridProps) {
   if (listings.length === 0) return null;
 
   return (
-    <Container as="section" className="py-8 md:py-12">
+    <div className={bg === "sand" ? "bg-sand-50" : ""}>
+      <Container as="section" className="py-8 md:py-12">
       {title && (
-        <h2 className="text-2xl font-semibold tracking-tight mb-6">{title}</h2>
+        <h2 className="text-2xl font-semibold tracking-tight mb-8 section-title">{title}</h2>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
         {listings.map((listing) => (
           <ListingCard key={listing.id} listing={listing} />
         ))}
       </div>
-    </Container>
+      </Container>
+    </div>
   );
 }
