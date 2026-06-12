@@ -54,7 +54,7 @@ export default function ReviewForm({ listingId, listingSlug }: Props) {
         <label className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
           Your rating
         </label>
-        <div className="flex gap-1">
+        <div className="flex gap-1 -ml-1">
           {[1, 2, 3, 4, 5].map(n => (
             <button
               key={n}
@@ -62,7 +62,7 @@ export default function ReviewForm({ listingId, listingSlug }: Props) {
               onClick={() => setRating(n)}
               onMouseEnter={() => setHovered(n)}
               onMouseLeave={() => setHovered(0)}
-              className={`text-2xl leading-none transition-colors star-btn ${
+              className={`w-11 h-11 flex items-center justify-center text-2xl leading-none transition-colors star-btn ${
                 n <= (hovered || rating) ? 'text-amber-400' : 'text-sand-200'
               }`}
               aria-label={`${n} star${n !== 1 ? 's' : ''}`}

@@ -144,7 +144,7 @@ export default async function HostDashboardPage() {
                   style={{
                     marginTop: "16px",
                     display: "inline-flex",
-                    height: "42px",
+                    height: "44px",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "8px",

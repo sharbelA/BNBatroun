@@ -36,14 +36,14 @@ export default function ReviewActions({ reviewId, currentStatus }: Props) {
       <button
         onClick={() => moderate('approved')}
         disabled={isPending}
-        className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
+        className="inline-flex min-h-11 items-center rounded-lg bg-green-600 px-3 text-xs font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
       >
         Approve
       </button>
       <button
         onClick={() => moderate('rejected')}
         disabled={isPending}
-        className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
+        className="inline-flex min-h-11 items-center rounded-lg bg-red-600 px-3 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
       >
         Reject
       </button>

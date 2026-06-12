@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-warm-700 bg-warm-800 px-8 py-8">
+        <div className="rounded-2xl border border-warm-700 bg-warm-800 px-6 py-8 sm:px-8">
           <h1 className="mb-1 text-xl font-semibold text-sand-50">
             Admin sign in
           </h1>

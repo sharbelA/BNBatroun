@@ -169,7 +169,7 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
                   className="object-cover"
                   sizes="(max-width: 640px) 50vw, 33vw"
                 />
-                <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-black/50 via-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-black/50 via-transparent p-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <span className="text-xs font-semibold text-white bg-black/40 px-2 py-0.5 rounded">
                     {index === 0 ? "Cover" : `#${index + 1}`}
                   </span>

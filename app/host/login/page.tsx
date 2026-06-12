@@ -23,7 +23,7 @@ export default function HostLoginPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-sand-200 bg-white px-8 py-8 shadow-sm">
+        <div className="rounded-2xl border border-sand-200 bg-white px-6 py-8 sm:px-8 shadow-sm">
           <h1 className="mb-6 text-xl font-semibold text-warm-900">
             Welcome back
           </h1>

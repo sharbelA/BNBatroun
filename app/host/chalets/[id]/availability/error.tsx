@@ -53,11 +53,11 @@ export default function HostAvailabilityError({
       >
         We couldn&apos;t load this calendar. Please try again.
       </p>
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-3">
         <button
           onClick={reset}
           style={{
-            height: "42px",
+            height: "44px",
             borderRadius: "12px",
             backgroundColor: "var(--accent)",
             padding: "0 24px",
@@ -75,7 +75,7 @@ export default function HostAvailabilityError({
           href="/host/dashboard"
           style={{
             display: "inline-flex",
-            height: "42px",
+            height: "44px",
             alignItems: "center",
             borderRadius: "12px",
             border: "1.5px solid var(--border)",

@@ -23,7 +23,7 @@ export default function HostDashboardError({
       </p>
       <button
         onClick={reset}
-        className="h-10 rounded-lg bg-[var(--accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90"
+        className="h-11 rounded-lg bg-[var(--accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90"
       >
         Try again
       </button>

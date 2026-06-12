@@ -216,11 +216,11 @@ export default function AvailabilityCalendar({
 
       {/* Calendar */}
       <div
+        className="avail-card"
         style={{
           background: "#fff",
           borderRadius: "16px",
           border: "1px solid var(--border-light, #ebebeb)",
-          padding: "24px",
           boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
           overflowX: "auto",
         }}
@@ -503,7 +503,7 @@ function SelectionPopup({
           top: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 50,
-          width: "100%",
+          width: "calc(100% - 32px)",
           maxWidth: "400px",
           background: "#fff",
           borderRadius: "20px",
@@ -717,6 +717,14 @@ const labelStyle: React.CSSProperties = {
 function CalendarStyles() {
   return (
     <style>{`
+      .avail-card {
+        padding: 24px;
+      }
+      @media (max-width: 640px) {
+        .avail-card {
+          padding: 14px;
+        }
+      }
       @keyframes avail-popup-in {
         from { opacity: 0; transform: translate(-50%, -48%); }
         to   { opacity: 1; transform: translate(-50%, -50%); }

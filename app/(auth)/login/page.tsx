@@ -29,7 +29,7 @@ export default async function LoginPage({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-[var(--border-light)] bg-white px-8 py-8 shadow-[var(--card-shadow)]">
+        <div className="rounded-2xl border border-[var(--border-light)] bg-white px-6 py-8 sm:px-8 shadow-[var(--card-shadow)]">
           <h1 className="mb-6 text-xl text-warm-900">Welcome back</h1>
           <LoginForm redirectTo={redirectTo} submitLabel="Sign in" />
           <p className="mt-5 text-center text-sm text-warm-500">

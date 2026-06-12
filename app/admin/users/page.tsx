@@ -9,7 +9,7 @@ export default function AdminUsersPage() {
 
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-3">
-        <select className="h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700">
+        <select className="h-11 md:h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700">
           <option value="">All roles</option>
           <option value="host">Host</option>
           <option value="admin">Admin</option>
@@ -17,7 +17,7 @@ export default function AdminUsersPage() {
         <input
           type="text"
           placeholder="Search by name or email…"
-          className="h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 w-64"
+          className="h-11 md:h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 w-full sm:w-64"
         />
       </div>
 

@@ -34,7 +34,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
         )}
         <button
           onClick={toggleSave}
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-full hover:scale-110 transition-transform duration-200"
+          className="absolute top-3 right-3 z-10 w-11 h-11 flex items-center justify-center rounded-full hover:scale-110 transition-transform duration-200"
           aria-label={isSaved ? "Unsave" : "Save"}
         >
           <Icon name="heart" size={24} fill={isSaved ? "var(--accent)" : "rgba(0,0,0,0.5)"} stroke="white" strokeWidth={2} />

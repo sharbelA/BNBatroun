@@ -2,19 +2,28 @@
  * Homepage loading skeleton — shown instantly while server data loads.
  */
 
-import { Container } from "@/components/ui";
+import Link from "next/link";
+import { Container, Icon } from "@/components/ui";
+import { SITE } from "@/lib/constants";
 
 export default function HomeLoading() {
   return (
     <div>
       {/* Header placeholder */}
-      <div className="sticky top-0 z-50 bg-white border-b border-[var(--border-light)]">
+      <div className="sticky top-0 z-50 header-surface border-b border-[var(--border-light)]">
         <Container>
-          <div className="flex h-20 items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg shimmer" />
-              <div className="w-20 h-5 rounded shimmer" />
-            </div>
+          <div className="flex h-[var(--header-height)] items-center justify-between gap-4">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center">
+                <Icon name="home" size={18} stroke="white" fill="none" />
+              </div>
+              <span
+                className="text-xl font-semibold tracking-tight text-[var(--foreground)]"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                {SITE.name}
+              </span>
+            </Link>
             <div className="w-64 h-12 rounded-full shimmer hidden md:block" />
             <div className="w-20 h-10 rounded-full shimmer" />
           </div>
