@@ -35,27 +35,30 @@ const columns = [
 export default function Footer() {
   return (
     <footer className="border-t border-warm-800 bg-warm-900 text-warm-300">
-      <Container className="py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <Container className="py-16 md:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[var(--accent)] flex items-center justify-center">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center">
                 <Icon name="home" size={16} stroke="white" fill="none" />
               </div>
-              <span className="text-lg font-bold tracking-tight text-white">
+              <span
+                className="text-lg font-semibold tracking-tight text-white"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
                 {SITE.name}
               </span>
             </div>
-            <p className="text-sm text-warm-400 leading-relaxed">
+            <p className="text-sm text-warm-400 leading-relaxed max-w-xs">
               {SITE.tagline}
             </p>
           </div>
 
           {columns.map((col) => (
             <div key={col.title}>
-              <h3 className="text-sm font-semibold mb-3 text-white">{col.title}</h3>
-              <ul className="space-y-2.5">
+              <h3 className="text-xs font-semibold mb-4 text-white uppercase tracking-widest">{col.title}</h3>
+              <ul className="space-y-3">
                 {col.links.map((link) => {
                   const isExternal = link.href.startsWith("http");
                   return (
@@ -65,14 +68,14 @@ export default function Footer() {
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-warm-400 hover:text-white hover:underline transition-colors"
+                          className="text-sm text-warm-400 hover:text-white transition-colors duration-200"
                         >
                           {link.label}
                         </a>
                       ) : (
                         <Link
                           href={link.href}
-                          className="text-sm text-warm-400 hover:text-white hover:underline transition-colors"
+                          className="text-sm text-warm-400 hover:text-white transition-colors duration-200"
                         >
                           {link.label}
                         </Link>
@@ -86,16 +89,16 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-10 pt-6 border-t border-warm-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-14 pt-8 border-t border-warm-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-warm-500">
             © {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <a
               href="https://instagram.com/manzeli.lb"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-warm-400 hover:text-white transition-colors"
+              className="text-warm-400 hover:text-white transition-colors duration-200"
               aria-label="Instagram"
             >
               <Icon name="instagram" size={18} />
@@ -105,7 +108,7 @@ export default function Footer() {
                 href={`https://wa.me/${WA}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-warm-400 hover:text-[#25D366] transition-colors"
+                className="text-warm-400 hover:text-[#25D366] transition-colors duration-200"
                 aria-label="WhatsApp"
               >
                 <Icon name="whatsapp" size={18} />

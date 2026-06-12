@@ -80,8 +80,8 @@ export default function Filters({ resultCount }: { resultCount: number }) {
                 onClick={() => toggleAmenity(key)}
                 className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
                   active
-                    ? "border-sea-600 bg-sea-50 text-sea-700"
-                    : "border-sand-200 bg-white text-warm-600 hover:bg-sand-50"
+                    ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
+                    : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
                 }`}
               >
                 {AMENITY_FILTER_LABELS[key]}
@@ -104,7 +104,7 @@ export default function Filters({ resultCount }: { resultCount: number }) {
             placeholder="Min"
             defaultValue={minPrice}
             onBlur={(e) => update({ minPrice: e.target.value || null })}
-            className="h-9 w-24 rounded-lg border border-sand-200 bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-sea-400 focus:ring-2 focus:ring-sea-100"
+            className="h-9 w-24 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
           />
           <span className="text-sm text-warm-400">–</span>
           <input
@@ -114,7 +114,7 @@ export default function Filters({ resultCount }: { resultCount: number }) {
             placeholder="Max"
             defaultValue={maxPrice}
             onBlur={(e) => update({ maxPrice: e.target.value || null })}
-            className="h-9 w-24 rounded-lg border border-sand-200 bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-sea-400 focus:ring-2 focus:ring-sea-100"
+            className="h-9 w-24 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
           />
         </div>
       </div>
@@ -135,8 +135,8 @@ export default function Filters({ resultCount }: { resultCount: number }) {
                 onClick={() => update({ bedrooms: active ? null : value })}
                 className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
                   active
-                    ? "border-sea-600 bg-sea-50 text-sea-700"
-                    : "border-sand-200 bg-white text-warm-600 hover:bg-sand-50"
+                    ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
+                    : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
                 }`}
               >
                 {n === 4 ? "4+" : n}
@@ -154,7 +154,7 @@ export default function Filters({ resultCount }: { resultCount: number }) {
         <select
           value={maxGuests}
           onChange={(e) => update({ maxGuests: e.target.value || null })}
-          className="h-9 rounded-lg border border-sand-200 bg-white px-3 text-sm text-warm-700 outline-none focus:border-sea-400 focus:ring-2 focus:ring-sea-100"
+          className="h-9 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-700 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
         >
           <option value="">Any</option>
           {[1, 2, 4, 6, 8, 10].map((n) => (
@@ -169,7 +169,7 @@ export default function Filters({ resultCount }: { resultCount: number }) {
         <button
           type="button"
           onClick={reset}
-          className="self-start text-sm font-medium text-sea-600 hover:underline"
+          className="self-start text-sm font-medium text-[var(--accent)] hover:underline"
         >
           Reset filters
         </button>
@@ -184,12 +184,12 @@ export default function Filters({ resultCount }: { resultCount: number }) {
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="inline-flex h-9 items-center gap-2 rounded-lg border border-sand-200 bg-white px-4 text-sm font-medium text-warm-700"
+          className="inline-flex h-11 items-center gap-2 rounded-full border border-[var(--border-light)] bg-white px-4 text-sm font-medium text-warm-700"
         >
           <FilterIcon />
           Filters
           {hasActiveFilters && (
-            <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-sea-600 text-[11px] font-semibold text-white">
+            <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent)] text-[11px] font-semibold text-white">
               {amenities.length + [minPrice, maxPrice, bedrooms, maxGuests].filter(Boolean).length}
             </span>
           )}
@@ -200,7 +200,7 @@ export default function Filters({ resultCount }: { resultCount: number }) {
       </div>
 
       {/* Desktop inline panel */}
-      <div className="hidden rounded-2xl border border-sand-200 bg-white p-5 md:block">
+      <div className="hidden rounded-2xl border border-[var(--border-light)] bg-white p-6 md:block">
         {panel}
       </div>
 

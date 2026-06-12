@@ -102,7 +102,7 @@ export default function PhotoGallery({ images, title }: PhotoGalleryProps) {
         {images.length > 1 && (
           <button
             onClick={() => { setActiveIndex(0); setModalOpen(true); }}
-            className="absolute bottom-4 right-4 flex items-center gap-2 bg-white border border-[var(--border)] rounded-lg px-4 py-2 text-sm font-semibold shadow-md hover:shadow-lg transition-shadow"
+            className="absolute bottom-4 right-4 flex items-center gap-2 bg-white border border-[var(--border)] rounded-full px-4 py-2 text-sm font-medium shadow-[var(--card-shadow)] hover:shadow-[var(--card-shadow-hover)] transition-shadow duration-200"
           >
             <Icon name="grid" size={16} />
             Show all photos ({images.length})

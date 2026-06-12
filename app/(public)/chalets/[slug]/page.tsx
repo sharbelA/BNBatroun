@@ -72,7 +72,7 @@ export default async function ChaletDetailPage(
         </div>
 
         <Container>
-          <div className="mt-8 flex flex-col lg:flex-row gap-12 lg:gap-16">
+          <div className="mt-10 flex flex-col lg:flex-row gap-12 lg:gap-20">
             {/* ── Left column ────────────────────────── */}
             <div className="flex-1 min-w-0">
 
@@ -80,7 +80,7 @@ export default async function ChaletDetailPage(
               <section>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h1 className="text-3xl font-bold leading-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                    <h1 className="text-3xl md:text-4xl leading-tight">
                       {listing.title}
                     </h1>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[var(--muted)] text-sm">
@@ -116,7 +116,7 @@ export default async function ChaletDetailPage(
              
               {/* ── Description ── */}
               <section>
-                <h2 className="text-xl font-semibold mb-3">About this place</h2>
+                <h2 className="text-xl md:text-2xl mb-4">About this place</h2>
                 <ExpandableText text={listing.description} />
               </section>
 
@@ -125,7 +125,7 @@ export default async function ChaletDetailPage(
                 <>
                   <Divider />
                   <section>
-                    <h2 className="text-xl font-semibold mb-4">
+                    <h2 className="text-xl md:text-2xl mb-5">
                       Sleeping arrangements
                     </h2>
                     <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
@@ -158,7 +158,7 @@ export default async function ChaletDetailPage(
                 <>
                   <Divider />
                   <section>
-                    <h2 className="text-xl font-semibold mb-4">
+                    <h2 className="text-xl md:text-2xl mb-5">
                       What this place offers
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -183,7 +183,7 @@ export default async function ChaletDetailPage(
                 <>
                   <Divider />
                   <section>
-                    <h2 className="text-xl font-semibold mb-4">House rules</h2>
+                    <h2 className="text-xl md:text-2xl mb-5">House rules</h2>
                     <ul className="space-y-3">
                       {listing.house_rules.map((rule, i) => (
                         <li key={i} className="flex items-start gap-3 text-sm">
@@ -201,7 +201,7 @@ export default async function ChaletDetailPage(
               {/* ── Availability Calendar ── */}
               <Divider />
               <section>
-                <h2 className="text-xl font-semibold mb-1">Availability</h2>
+                <h2 className="text-xl md:text-2xl mb-1">Availability</h2>
                 <p className="text-sm text-[var(--muted)] mb-5">
                   {availability.length > 0
                     ? "Select your dates to see pricing."
@@ -223,7 +223,7 @@ export default async function ChaletDetailPage(
                 <>
                   <Divider />
                   <section>
-                    <h2 className="text-xl font-semibold mb-4">Location</h2>
+                    <h2 className="text-xl md:text-2xl mb-5">Location</h2>
                     <div className="rounded-2xl overflow-hidden border border-[var(--border-light)] h-72">
                       <iframe
                         title="Chalet location"
@@ -283,7 +283,7 @@ export default async function ChaletDetailPage(
 // ─── Sub-components ──────────────────────────────────────────
 
 function Divider() {
-  return <hr className="my-8 border-[var(--border-light)]" />;
+  return <hr className="my-10 md:my-12 border-[var(--border-light)]" />;
 }
 
 function ExpandableText({ text }: { text: string }) {

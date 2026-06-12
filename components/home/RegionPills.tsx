@@ -32,7 +32,7 @@ export default function RegionPills({
             className={`flex items-center gap-2 px-5 py-2.5 border rounded-full text-sm font-medium transition-all duration-200 ${
               isActive
                 ? "bg-[var(--foreground)] text-white border-[var(--foreground)]"
-                : "bg-white border-[var(--border)] hover:border-[var(--foreground)] hover:shadow-sm"
+                : "bg-white border-[var(--border)] hover:border-[var(--accent)]/40 hover:shadow-[var(--card-shadow)]"
             }`}
           >
             <span className="text-base">{region.emoji}</span>

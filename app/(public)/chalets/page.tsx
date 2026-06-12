@@ -47,8 +47,8 @@ export default async function ChaletsPage({
     <>
       <Header />
       <main className="flex-1">
-        <Container className="py-12 md:py-16">
-          <h1 className="mb-8 text-3xl font-semibold text-warm-900">
+        <Container className="py-14 md:py-20">
+          <h1 className="mb-10 text-3xl md:text-4xl tracking-tight text-warm-900">
             Chalets in Batroun
           </h1>
 
@@ -59,13 +59,13 @@ export default async function ChaletsPage({
           </p>
 
           {listings.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-sand-200 bg-white py-20 text-center">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--border-light)] bg-white py-24 text-center">
               <p className="text-sm font-medium text-warm-700">
                 No chalets match your filters.
               </p>
               <Link
                 href="/chalets"
-                className="text-sm font-medium text-sea-600 hover:underline"
+                className="text-sm font-medium text-[var(--accent)] hover:underline"
               >
                 Reset filters
               </Link>

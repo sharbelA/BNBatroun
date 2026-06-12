@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --muted: #717171;
-  --border: #dddddd;
-  --border-light: #ebebeb;
-  --accent: #c4582a;
-  --accent-hover: #a94a22;
-  --accent-light: #fef4f0;
-  --surface: #f7f7f7;
-  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --card-shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.12);
-  --header-height: 80px;
-  --radius: 12px;
-  --radius-lg: 16px;
+  --background: #fffdfb;
+  --foreground: #21201d;
+  --muted: #7a7367;
+  --border: #e4ddd3;
+  --border-light: #ece6dd;
+  --accent: #c1572f;
+  --accent-hover: #a8481f;
+  --accent-light: #fbeee5;
+  --surface: #f8f4ee;
+  --card-shadow: 0 1px 3px rgba(40, 30, 20, 0.05), 0 8px 24px rgba(40, 30, 20, 0.05);
+  --card-shadow-hover: 0 4px 10px rgba(40, 30, 20, 0.06), 0 16px 36px rgba(40, 30, 20, 0.09);
+  --header-height: 84px;
+  --radius: 14px;
+  --radius-lg: 20px;
 }
 
 /* ── CSS-variable-backed theme references (fonts, etc.) ─────────────────── */
@@ -28,9 +28,9 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-light: var(--accent-light);
   --color-surface: var(--surface);
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Monaco, monospace;
-  --font-heading: Georgia, "Times New Roman", serif;
+  --font-heading: var(--font-fraunces), Georgia, "Times New Roman", serif;
 
   /* Warm gray palette (used for text) */
   --color-warm-50:  #fafaf9;
@@ -75,8 +75,68 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Heading scale ────────────────────────────────────────────────────────
+   A refined serif is used for all headings by default; tighter tracking
+   and shorter line-height give them a confident, editorial feel. */
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+p {
+  line-height: 1.7;
+}
+
+/* ── Refined button system ────────────────────────────────────────────────
+   Shared primitives for primary / secondary / ghost actions. Sizing is
+   left to the consumer (padding/height utilities) so existing layouts
+   keep their dimensions; these only set color, border and motion. */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.2s ease;
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--foreground);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+.btn-ghost:hover {
+  background: var(--surface);
+}
+
+/* ── Sticky header blur ──────────────────────────────────────────────────── */
+.header-surface {
+  background: rgba(255, 253, 251, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Smooth scrolling */

@@ -25,11 +25,11 @@ export default function ListingGrid({
 
   return (
     <div className={bg === "sand" ? "bg-sand-50" : ""}>
-      <Container as="section" className="py-8 md:py-12">
+      <Container as="section" className="py-14 md:py-20">
       {title && (
-        <h2 className="text-2xl font-semibold tracking-tight mb-8 section-title">{title}</h2>
+        <h2 className="text-2xl md:text-3xl tracking-tight mb-10 section-title">{title}</h2>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
         {listings.map((listing) => (
           <ListingCard key={listing.id} listing={listing} />
         ))}

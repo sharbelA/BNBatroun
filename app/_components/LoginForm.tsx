@@ -89,7 +89,7 @@ export default function LoginForm({
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading}
           placeholder="you@example.com"
-          className="h-11 rounded-xl border border-sand-200 bg-white px-4 text-sm text-warm-900 placeholder:text-warm-400 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100 disabled:opacity-50"
+          className="h-11 rounded-xl border border-[var(--border-light)] bg-white px-4 text-sm text-warm-900 placeholder:text-warm-400 outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)] disabled:opacity-50"
         />
       </div>
 
@@ -106,14 +106,14 @@ export default function LoginForm({
           onChange={(e) => setPassword(e.target.value)}
           disabled={loading}
           placeholder="••••••••"
-          className="h-11 rounded-xl border border-sand-200 bg-white px-4 text-sm text-warm-900 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100 disabled:opacity-50"
+          className="h-11 rounded-xl border border-[var(--border-light)] bg-white px-4 text-sm text-warm-900 outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)] disabled:opacity-50"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading || !email || !password}
-        className="mt-1 h-11 rounded-xl bg-sea-600 text-sm font-semibold text-white transition hover:bg-sea-700 active:scale-[0.98] disabled:opacity-50"
+        className="mt-1 h-11 rounded-xl bg-[var(--accent)] text-sm font-semibold text-white transition-colors duration-200 hover:bg-[var(--accent-hover)] active:scale-[0.98] disabled:opacity-50"
       >
         {loading ? 'Signing in…' : submitLabel}
       </button>
