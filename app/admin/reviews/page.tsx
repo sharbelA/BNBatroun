@@ -48,8 +48,8 @@ export default async function AdminReviewsPage({
           <p className="text-warm-500">No reviews{status ? ` with status "${status}"` : ''} yet.</p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-sand-200 bg-white overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-2xl border border-sand-200 bg-white overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-sand-100 bg-sand-50 text-xs uppercase tracking-wide text-warm-500">
                 <th className="px-4 py-3 text-left font-semibold">Chalet</th>

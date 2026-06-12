@@ -9,11 +9,11 @@ export default async function AdminListingsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-warm-900">All chalets</h1>
         <Link
           href="/admin/listings/new"
-         className="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-white transition hover:opacity-90" style={{ backgroundColor: "var(--accent)" }}
+         className="inline-flex h-11 md:h-9 items-center rounded-lg px-4 text-sm font-medium text-white transition hover:opacity-90" style={{ backgroundColor: "var(--accent)" }}
         >
           + New chalet
         </Link>
@@ -21,7 +21,7 @@ export default async function AdminListingsPage() {
 
       {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-sand-200 bg-white">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[760px] text-sm">
           <thead className="border-b border-sand-200 bg-sand-50 text-left">
             <tr>
               {[

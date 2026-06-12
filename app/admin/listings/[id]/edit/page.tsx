@@ -27,7 +27,7 @@ export default async function EditListingPage(
         </Link>
         <Link
           href={`/admin/listings/${id}/photos`}
-          className="inline-flex h-9 items-center rounded-lg border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
+          className="inline-flex h-11 md:h-9 items-center rounded-lg border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
         >
           Manage photos
         </Link>

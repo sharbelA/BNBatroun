@@ -23,12 +23,12 @@ export default async function AdminDashboardPage() {
     <div className="flex flex-col gap-10">
 
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-warm-900">Overview</h1>
         <Link
           href="/admin/listings/new"
           style={{ backgroundColor: 'var(--accent)' }}
-          className="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-white transition hover:opacity-90"
+          className="inline-flex h-11 md:h-9 items-center rounded-lg px-4 text-sm font-medium text-white transition hover:opacity-90"
         >
           + New chalet
         </Link>
@@ -64,8 +64,8 @@ export default async function AdminDashboardPage() {
             View all
           </Link>
         </div>
-        <div className="overflow-hidden rounded-xl border border-sand-200 bg-white">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-xl border border-sand-200 bg-white">
+          <table className="w-full min-w-[560px] text-sm">
             <thead className="border-b border-sand-200 bg-sand-50 text-left">
               <tr>
                 {['Title', 'Host', 'Price / night', 'Status'].map((h) => (
@@ -138,8 +138,8 @@ export default async function AdminDashboardPage() {
             View all
           </Link>
         </div>
-        <div className="overflow-hidden rounded-xl border border-sand-200 bg-white">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-xl border border-sand-200 bg-white">
+          <table className="w-full min-w-[480px] text-sm">
             <thead className="border-b border-sand-200 bg-sand-50 text-left">
               <tr>
                 {['Name', 'Phone / WhatsApp', 'Chalets', 'Joined'].map((h) => (

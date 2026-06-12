@@ -24,16 +24,16 @@ export default function AdminPage() {
       </div>
 
       {/* Quick links */}
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Link
           href="/admin/listings"
-          className="inline-flex h-9 items-center rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+          className="inline-flex h-11 md:h-9 items-center rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
         >
           Manage listings
         </Link>
         <Link
           href="/admin/users"
-          className="inline-flex h-9 items-center rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+          className="inline-flex h-11 md:h-9 items-center rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
         >
           Manage users
         </Link>

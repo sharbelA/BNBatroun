@@ -305,7 +305,7 @@ export default function ListingForm({
         <button
           type="submit"
           disabled={isPending}
-          className="h-10 rounded-lg bg-[var(--accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+          className="h-11 md:h-10 rounded-lg bg-[var(--accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
         >
           {isPending
             ? "Saving…"
@@ -315,7 +315,7 @@ export default function ListingForm({
         </button>
         <Link
           href="/admin/listings"
-          className="inline-flex h-10 items-center rounded-lg border border-sand-200 px-6 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
+          className="inline-flex h-11 md:h-10 items-center rounded-lg border border-sand-200 px-6 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
         >
           Cancel
         </Link>
@@ -327,7 +327,7 @@ export default function ListingForm({
 // ─── Helpers ────────────────────────────────────────────────
 
 const inputCls =
-  "h-10 w-full rounded-xl border border-sand-200 bg-white px-4 text-sm text-warm-900 placeholder:text-warm-400 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100";
+  "h-11 md:h-10 w-full rounded-xl border border-sand-200 bg-white px-4 text-sm text-warm-900 placeholder:text-warm-400 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100";
 
 function Field({
   label,

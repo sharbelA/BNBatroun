@@ -15,11 +15,11 @@ export default async function AdminHostsPage() {
         <HostCreatedToast />
       </Suspense>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-warm-900">Hosts</h1>
         <Link
           href="/admin/hosts/new"
-          className="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-white transition hover:opacity-90"
+          className="inline-flex h-11 md:h-9 items-center rounded-lg px-4 text-sm font-medium text-white transition hover:opacity-90"
           style={{ backgroundColor: "var(--accent)" }}
         >
           + Create host
@@ -28,7 +28,7 @@ export default async function AdminHostsPage() {
 
       {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-sand-200 bg-white">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[560px] text-sm">
           <thead className="border-b border-sand-200 bg-sand-50 text-left">
             <tr>
               {["Name", "Phone", "WhatsApp", "Chalets", "Joined"].map((h) => (

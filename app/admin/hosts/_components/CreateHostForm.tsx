@@ -68,7 +68,7 @@ export default function CreateHostForm() {
           <button
             type="button"
             onClick={() => setPassword(generatePassword())}
-            className="h-10 shrink-0 rounded-xl border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
+            className="h-11 md:h-10 shrink-0 rounded-xl border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
           >
             Generate
           </button>
@@ -103,13 +103,13 @@ export default function CreateHostForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="h-10 rounded-lg bg-[var(--accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+          className="h-11 md:h-10 rounded-lg bg-[var(--accent)] px-6 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
         >
           {isPending ? "Creating…" : "Create host"}
         </button>
         <Link
           href="/admin/hosts"
-          className="inline-flex h-10 items-center rounded-lg border border-sand-200 px-6 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
+          className="inline-flex h-11 md:h-10 items-center rounded-lg border border-sand-200 px-6 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
         >
           Cancel
         </Link>
@@ -119,7 +119,7 @@ export default function CreateHostForm() {
 }
 
 const inputCls =
-  "h-10 w-full rounded-xl border border-sand-200 bg-white px-4 text-sm text-warm-900 placeholder:text-warm-400 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100";
+  "h-11 md:h-10 w-full rounded-xl border border-sand-200 bg-white px-4 text-sm text-warm-900 placeholder:text-warm-400 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100";
 
 function Field({
   label,
