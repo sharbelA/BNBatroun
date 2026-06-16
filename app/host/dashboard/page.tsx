@@ -13,62 +13,24 @@ export default async function HostDashboardPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-12 md:px-6 md:py-16">
+
       {/* Header */}
-      <div
-        style={{
-          marginBottom: "32px",
-          paddingBottom: "24px",
-          borderBottom: "1px solid var(--border-light, #ebebeb)",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "24px",
-            fontWeight: 700,
-            color: "var(--foreground)",
-            marginBottom: "6px",
-          }}
-        >
+      <div className="mb-8 pb-6 border-b border-[var(--border-light)]">
+        <h1 className="text-2xl font-semibold text-[var(--foreground)] mb-1.5">
           Your chalets
         </h1>
-        <p style={{ fontSize: "14px", color: "var(--muted)" }}>
+        <p className="text-sm text-[var(--muted)]">
           Manage availability for the chalets assigned to you.
         </p>
       </div>
 
       {listings.length === 0 ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "12px",
-            borderRadius: "20px",
-            border: "1px dashed var(--border, #ddd)",
-            background: "var(--surface, #f7f7f7)",
-            padding: "80px 24px",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              width: "56px",
-              height: "56px",
-              borderRadius: "16px",
-              background: "var(--accent-light)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: "4px",
-            }}
-          >
-            <Icon name="bed" size={24} />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] py-20 px-6 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center mb-1">
+            <Icon name="bed" size={24} className="text-[var(--accent)]" />
           </div>
-          <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--foreground)" }}>
-            No chalets yet
-          </p>
-          <p style={{ fontSize: "14px", color: "var(--muted)", maxWidth: "280px" }}>
+          <p className="text-[15px] font-semibold text-[var(--foreground)]">No chalets yet</p>
+          <p className="text-sm text-[var(--muted)] max-w-[280px]">
             Contact the BNBatroun team to get your chalet listed on the platform.
           </p>
         </div>
@@ -77,20 +39,10 @@ export default async function HostDashboardPage() {
           {listings.map((listing) => (
             <div
               key={listing.id}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-                borderRadius: "20px",
-                border: "1px solid var(--border-light, #ebebeb)",
-                background: "#fff",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
-                transition: "box-shadow 0.2s, transform 0.2s",
-              }}
-              className="hover:shadow-lg hover:-translate-y-0.5"
+              className="flex flex-col overflow-hidden rounded-2xl border border-[var(--border-light)] bg-white shadow-[var(--card-shadow)] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5 transition-all duration-200"
             >
               {/* Cover image */}
-              <div className="relative aspect-[4/3] w-full" style={{ background: "var(--surface)" }}>
+              <div className="relative aspect-[4/3] w-full bg-[var(--surface)]">
                 {listing.cover_image ? (
                   <Image
                     src={listing.cover_image}
@@ -100,65 +52,32 @@ export default async function HostDashboardPage() {
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />
                 ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      height: "100%",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "var(--border)",
-                    }}
-                  >
+                  <div className="flex h-full items-center justify-center text-[var(--border)]">
                     <Icon name="bed" size={32} />
                   </div>
                 )}
               </div>
 
               {/* Card body */}
-              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
-                <h2
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    color: "var(--foreground)",
-                  }}
-                >
+              <div className="p-5 flex flex-col gap-1 flex-1">
+                <h2 className="text-base font-semibold text-[var(--foreground)]">
                   {listing.title}
                 </h2>
-                <p
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    fontSize: "13px",
-                    color: "var(--muted)",
-                  }}
-                >
+                <p className="flex items-center gap-1 text-xs text-[var(--muted)]">
                   <Icon name="mapPin" size={13} />
                   {listing.location}
                 </p>
 
                 <Link
                   href={`/host/chalets/${listing.id}/availability`}
-                  className="hover:opacity-90"
-                  style={{
-                    marginTop: "16px",
-                    display: "inline-flex",
-                    height: "44px",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                    borderRadius: "12px",
-                    backgroundColor: "var(--accent)",
-                    padding: "0 20px",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    color: "#fff",
-                    textDecoration: "none",
-                    transition: "opacity 0.15s",
-                  }}
+                  className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 7h12"/><path d="M5 1v4"/><path d="M11 1v4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="3" width="12" height="11" rx="2"/>
+                    <path d="M2 7h12"/>
+                    <path d="M5 1v4"/>
+                    <path d="M11 1v4"/>
+                  </svg>
                   Manage availability
                 </Link>
               </div>

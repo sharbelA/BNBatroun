@@ -13,7 +13,7 @@ export default function HostLoginPage() {
         <div className="mb-8 text-center">
           <Link
             href="/"
-            className="text-2xl font-bold tracking-tight text-sea-700"
+            className="text-2xl font-semibold tracking-tight text-warm-900"
           >
             BNBatroun
           </Link>

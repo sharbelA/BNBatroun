@@ -77,7 +77,7 @@ export default function AboutPage() {
         <section className="bg-sand-50 py-20 md:py-28">
           <Container>
             <div className="mx-auto max-w-3xl">
-              <h2 className="text-2xl md:text-3xl text-warm-900 mb-14 text-center" style={{ display: 'block', textAlign: 'center' }}>What makes us different</h2>
+              <h2 className="text-2xl md:text-3xl text-warm-900 mb-14 text-center">What makes us different</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 {[
                   { icon: '✋', title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
