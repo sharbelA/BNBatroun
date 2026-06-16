@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getActiveSlugs } from "@/lib/supabase/queries/listings";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://manzeli.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://bnbatroun.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const slugs = await getActiveSlugs();

@@ -15,14 +15,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Manzeli — Chalets in Batroun, Lebanon",
+  title: "BNBatroun — Chalets in Batroun, Lebanon",
   description:
     "Discover and book unique chalets in Batroun. Local, trusted, community-driven.",
   openGraph: {
-    title: "Manzeli — Chalets in Batroun, Lebanon",
+    title: "BNBatroun — Chalets in Batroun, Lebanon",
     description:
       "Discover and book unique chalets in Batroun. Local, trusted, community-driven.",
-    siteName: "Manzeli",
+    siteName: "BNBatroun",
     type: "website",
   },
 };

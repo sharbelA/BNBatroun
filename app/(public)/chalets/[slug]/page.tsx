@@ -23,7 +23,7 @@ export async function generateMetadata(
   const description = listing.description.slice(0, 160);
 
   return {
-    title: `${listing.title} — ${listing.bedrooms}BR in Batroun | Manzeli`,
+    title: `${listing.title} — ${listing.bedrooms}BR in Batroun | BNBatroun`,
     description,
     openGraph: {
       title: listing.title,
@@ -106,7 +106,7 @@ export default async function ChaletDetailPage(
                     </div>
                   </div>
                   <div className="shrink-0 bg-[var(--accent-light)] text-[var(--accent)] text-xs font-semibold px-3 py-1.5 rounded-full border border-[var(--accent)]/20 whitespace-nowrap">
-                    Managed by Manzeli
+                    Managed by BNBatroun
                   </div>
                 </div>
               </section>

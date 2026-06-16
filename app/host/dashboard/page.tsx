@@ -69,7 +69,7 @@ export default async function HostDashboardPage() {
             No chalets yet
           </p>
           <p style={{ fontSize: "14px", color: "var(--muted)", maxWidth: "280px" }}>
-            Contact the Manzeli team to get your chalet listed on the platform.
+            Contact the BNBatroun team to get your chalet listed on the platform.
           </p>
         </div>
       ) : (

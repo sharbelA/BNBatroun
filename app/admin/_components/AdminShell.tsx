@@ -48,7 +48,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* ── Mobile top bar ──────────────────────── */}
       <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-warm-700 bg-warm-900 px-4 md:hidden">
         <Link href="/" className="text-lg font-bold tracking-tight text-sand-50">
-          Manzeli
+          BNBatroun
         </Link>
         <button
           onClick={() => setDrawerOpen(true)}
@@ -75,7 +75,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   className="block text-lg font-bold tracking-tight text-sand-50"
                   onClick={() => setDrawerOpen(false)}
                 >
-                  Manzeli
+                  BNBatroun
                 </Link>
                 <span className="text-xs font-semibold uppercase tracking-widest text-warm-500">
                   Admin
@@ -126,7 +126,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           href="/"
           className="mb-1 block text-lg font-bold tracking-tight text-sand-50"
         >
-          Manzeli
+          BNBatroun
         </Link>
         <span className="mb-8 text-xs font-semibold uppercase tracking-widest text-warm-500">
           Admin

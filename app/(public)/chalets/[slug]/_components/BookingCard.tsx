@@ -15,7 +15,7 @@ import {
 } from "date-fns";
 import { Icon } from "@/components/ui";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://manzeli.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bnbatroun.com";
 const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 
 type PickerField = "checkin" | "checkout" | null;
@@ -396,7 +396,7 @@ export default function BookingCard({
 // ─── Calendar styles ─────────────────────────────────────────
 
 const CALENDAR_CSS = `
-  /* Override DayPicker CSS variables to match Manzeli design */
+  /* Override DayPicker CSS variables to match BNBatroun design */
   .booking-cal .rdp-root {
     --rdp-accent-color: var(--accent);
     --rdp-accent-background-color: var(--accent-light);

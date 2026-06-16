@@ -3,19 +3,19 @@ import { Header, Footer } from "@/components/layout";
 
 const WA = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 const WA_LINK = WA
-  ? "https://wa.me/" + WA + "?text=" + encodeURIComponent("Hi! I'd like to list my chalet on Manzeli.")
+  ? "https://wa.me/" + WA + "?text=" + encodeURIComponent("Hi! I'd like to list my chalet on BNBatroun.")
   : "#";
 
 export const metadata: Metadata = {
   title: "List your chalet",
-  description: "Earn income from your Batroun chalet by listing it on Manzeli.",
+  description: "Earn income from your Batroun chalet by listing it on BNBatroun.",
 };
 
 const BENEFITS = [
   { title: "Direct WhatsApp bookings", body: "Guests contact you directly — no middlemen, no platform fees on each booking." },
   { title: "Full control", body: "Set your own prices, block dates when you need to, and manage your availability calendar." },
   { title: "Beautiful listing page", body: "Professional photos, detailed amenities, and an instant-view availability calendar." },
-  { title: "Local focus", body: "Manzeli is built for Batroun. Every guest who visits is looking for exactly what you offer." },
+  { title: "Local focus", body: "BNBatroun is built for Batroun. Every guest who visits is looking for exactly what you offer." },
 ];
 
 const STEPS = [
@@ -31,7 +31,7 @@ export default function ListYourChaletPage() {
       <main>
         <section className="px-4 py-24 text-center text-white md:py-32" style={{ backgroundColor: "var(--accent)" }}>
           <h1 className="mb-5 text-4xl tracking-tight md:text-6xl">
-            List your chalet on Manzeli
+            List your chalet on BNBatroun
           </h1>
           <p className="mx-auto mb-9 max-w-xl text-lg opacity-90 leading-relaxed">
             Reach guests looking for exactly what Batroun offers — and keep full control of your bookings.
@@ -42,7 +42,7 @@ export default function ListYourChaletPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-4 py-20 md:py-28 md:px-6">
-          <h2 className="mb-14 text-center text-2xl md:text-3xl">Why list with Manzeli?</h2>
+          <h2 className="mb-14 text-center text-2xl md:text-3xl">Why list with BNBatroun?</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {BENEFITS.map(function (item) {
               return (

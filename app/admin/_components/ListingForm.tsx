@@ -8,6 +8,7 @@ import {
   updateListingAction,
   type ActionState,
 } from "@/app/_actions/listings";
+import { BATROUN_AREAS } from "@/lib/constants";
 
 const AMENITIES = [
   { name: "wifi", label: "WiFi" },
@@ -114,16 +115,20 @@ export default function ListingForm({
           />
         </Field>
 
-        <Field label="Location" htmlFor="location">
-          <input
+        <Field label="Area" htmlFor="location">
+          <select
             id="location"
             name="location"
-            type="text"
             required
-            defaultValue={listing?.location ?? "Batroun"}
-            placeholder="e.g. Batroun Seafront"
+            defaultValue={listing?.location ?? "Batroun City"}
             className={inputCls}
-          />
+          >
+            {BATROUN_AREAS.map((a) => (
+              <option key={a.slug} value={a.name}>
+                {a.emoji} {a.name}
+              </option>
+            ))}
+          </select>
         </Field>
 
         <Field label="Description" htmlFor="description">

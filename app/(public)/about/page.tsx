@@ -6,7 +6,7 @@ import { Container } from '@/components/ui'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'Manzeli connects travelers with handpicked chalets in Batroun, Lebanon.',
+    'BNBatroun connects travelers with handpicked chalets in Batroun, Lebanon.',
 }
 
 export default function AboutPage() {
@@ -23,7 +23,7 @@ export default function AboutPage() {
               Since 2025
             </div>
             <h1 className="mb-5 text-4xl md:text-6xl tracking-tight text-warm-900 animate-page-in">
-              About Manzeli
+              About BNBatroun
             </h1>
             <p className="mx-auto max-w-xl text-lg leading-relaxed text-warm-500">
               A curated collection of chalets in Batroun, Lebanon — where the
@@ -38,9 +38,10 @@ export default function AboutPage() {
             <div className="mx-auto max-w-2xl">
               <h2 className="text-2xl md:text-3xl text-warm-900 mb-6 section-title">Our story</h2>
               <p className="leading-relaxed text-warm-600 mb-4">
-                Manzeli (منزلي — &quot;my home&quot; in Arabic) was built to connect travelers
-                with the best chalets in Batroun, North Lebanon. Every property is
-                hand-selected and verified to ensure an authentic, comfortable stay.
+                BNBatroun — your bed-and-breakfast network in Batroun — was built
+                to connect travelers with the best chalets in North Lebanon.
+                Every property is hand-selected and verified to ensure an
+                authentic, comfortable stay.
               </p>
               <p className="leading-relaxed text-warm-600">
                 Booking is simple and personal — all inquiries go directly to the
@@ -65,7 +66,7 @@ export default function AboutPage() {
               </p>
               <p className="leading-relaxed text-warm-300">
                 Whether you want a sea-view villa, a stone chalet in the pine
-                forests, or a poolside retreat, Batroun has it all — and Manzeli
+                forests, or a poolside retreat, Batroun has it all — and BNBatroun
                 helps you find it.
               </p>
             </div>
@@ -100,7 +101,7 @@ export default function AboutPage() {
             <div className="mx-auto max-w-2xl rounded-2xl bg-[var(--accent)] px-8 py-14 text-center text-white">
               <h2 className="mb-3 text-2xl md:text-3xl text-white">Own a chalet in Batroun?</h2>
               <p className="mb-7 text-white/80">
-                List it on Manzeli and reach guests looking for exactly what you
+                List it on BNBatroun and reach guests looking for exactly what you
                 offer.
               </p>
               <Link

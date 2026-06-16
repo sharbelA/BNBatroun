@@ -32,7 +32,7 @@ export default function AdminLoginForm() {
           required
           disabled={isPending}
           className="h-11 rounded-xl border border-sand-200 bg-white px-4 text-sm text-warm-900 placeholder-warm-400 outline-none transition focus:border-sea-400 focus:ring-2 focus:ring-sea-100 disabled:opacity-60"
-          placeholder="admin@manzeli.com"
+          placeholder="admin@bnbatroun.com"
         />
       </div>
 

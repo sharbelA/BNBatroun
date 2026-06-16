@@ -15,7 +15,7 @@ export default function AdminLoginPage() {
             href="/"
             className="text-2xl font-bold tracking-tight text-sand-100"
           >
-            Manzeli
+            BNBatroun
           </Link>
           <p className="mt-1 text-sm text-warm-400">Admin portal</p>
         </div>

@@ -39,6 +39,7 @@ export default async function ChaletsPage({
     maxPrice: parseNumber(params.maxPrice),
     bedrooms: parseNumber(params.bedrooms),
     maxGuests: parseNumber(params.maxGuests),
+    area: typeof params.area === "string" ? params.area : undefined,
   };
 
   const listings = await getFilteredListings(filters);

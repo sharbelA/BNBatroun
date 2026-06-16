@@ -71,6 +71,7 @@ export type ListingFilters = {
   maxPrice?: number;
   bedrooms?: number; // 4 means "4+"
   maxGuests?: number;
+  area?: string; // matches the `location` column
 };
 
 export async function getFilteredListings(
@@ -96,6 +97,7 @@ export async function getFilteredListings(
         : query.eq("bedrooms", filters.bedrooms);
   }
   if (filters.maxGuests !== undefined) query = query.gte("max_guests", filters.maxGuests);
+  if (filters.area) query = query.eq("location", filters.area);
 
   query = query.order("created_at", { ascending: false });
 

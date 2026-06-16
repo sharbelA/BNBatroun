@@ -15,7 +15,7 @@ export default function HostLoginPage() {
             href="/"
             className="text-2xl font-bold tracking-tight text-sea-700"
           >
-            Manzeli
+            BNBatroun
           </Link>
           <p className="mt-1 text-sm text-warm-500">
             Sign in to manage your chalets

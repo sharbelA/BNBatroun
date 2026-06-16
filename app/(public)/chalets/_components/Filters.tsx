@@ -5,6 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   AMENITY_FILTER_KEYS,
   AMENITY_FILTER_LABELS,
+  BATROUN_AREAS,
   type AmenityFilterKey,
 } from "@/lib/constants";
 
@@ -32,13 +33,14 @@ export default function Filters({ resultCount }: { resultCount: number }) {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const amenities = parseList(searchParams.get("amenities")) as AmenityFilterKey[];
+  const area = searchParams.get("area") ?? "";
   const minPrice = searchParams.get("minPrice") ?? "";
   const maxPrice = searchParams.get("maxPrice") ?? "";
   const bedrooms = searchParams.get("bedrooms") ?? "";
   const maxGuests = searchParams.get("maxGuests") ?? "";
 
   const hasActiveFilters =
-    amenities.length > 0 || minPrice || maxPrice || bedrooms || maxGuests;
+    amenities.length > 0 || area || minPrice || maxPrice || bedrooms || maxGuests;
 
   function update(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -65,6 +67,33 @@ export default function Filters({ resultCount }: { resultCount: number }) {
 
   const panel = (
     <div className="flex flex-col gap-6">
+      {/* Area */}
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
+          Area
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {BATROUN_AREAS.map((a) => {
+            const active = area === a.name;
+            return (
+              <button
+                key={a.slug}
+                type="button"
+                onClick={() => update({ area: active ? null : a.name })}
+                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
+                  active
+                    ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
+                    : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
+                }`}
+              >
+                <span className="mr-1.5">{a.emoji}</span>
+                {a.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Amenities */}
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
@@ -190,7 +219,7 @@ export default function Filters({ resultCount }: { resultCount: number }) {
           Filters
           {hasActiveFilters && (
             <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent)] text-[11px] font-semibold text-white">
-              {amenities.length + [minPrice, maxPrice, bedrooms, maxGuests].filter(Boolean).length}
+              {amenities.length + [area, minPrice, maxPrice, bedrooms, maxGuests].filter(Boolean).length}
             </span>
           )}
         </button>

@@ -27,7 +27,7 @@ const columns = [
     title: "Contact",
     links: [
       ...(WA ? [{ label: "WhatsApp us", href: `https://wa.me/${WA}` }] : []),
-      { label: "Instagram", href: "https://instagram.com/manzeli.lb" },
+      { label: "Instagram", href: "https://instagram.com/bnbatroun" },
     ],
   },
 ] as const;
@@ -95,7 +95,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-5">
             <a
-              href="https://instagram.com/manzeli.lb"
+              href="https://instagram.com/bnbatroun"
               target="_blank"
               rel="noopener noreferrer"
               className="text-warm-400 hover:text-white transition-colors duration-200"

@@ -80,7 +80,7 @@ export default function HostShell({ children }: { children: React.ReactNode }) {
                   letterSpacing: '-0.01em',
                 }}
               >
-                Manzeli
+                BNBatroun
               </span>
             </Link>
 

@@ -3,7 +3,7 @@ import { getListingFull } from "@/lib/supabase/queries/listings";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Manzeli chalet listing";
+export const alt = "BNBatroun chalet listing";
 
 export default async function Image(
   props: { params: Promise<{ slug: string }> }
@@ -78,7 +78,7 @@ export default async function Image(
               <span style={{ fontSize: 22, opacity: 0.85 }}>/ night</span>
             )}
             <span style={{ fontSize: 22, opacity: 0.7, marginLeft: 16 }}>
-              Manzeli
+              BNBatroun
             </span>
           </div>
         </div>

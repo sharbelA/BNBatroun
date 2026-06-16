@@ -11,6 +11,26 @@ export const REGIONS = [
 
 export type RegionSlug = (typeof REGIONS)[number]["slug"];
 
+// ─── Batroun sub-areas ──────────────────────────────────────
+// Used for location filtering within the Batroun district.
+export const BATROUN_AREAS = [
+  { name: "Batroun City", slug: "batroun-city", emoji: "🏛️" },
+  { name: "Kfar Abida", slug: "kfar-abida", emoji: "🌊" },
+  { name: "Hamat", slug: "hamat", emoji: "⛰️" },
+  { name: "Msaylha", slug: "msaylha", emoji: "🏰" },
+  { name: "Thoum", slug: "thoum", emoji: "🌿" },
+  { name: "Kfour", slug: "kfour", emoji: "🏘️" },
+  { name: "Rachana", slug: "rachana", emoji: "🎨" },
+  { name: "Hardine", slug: "hardine", emoji: "🌲" },
+  { name: "Douma", slug: "douma", emoji: "🏔️" },
+  { name: "Smar Jbeil", slug: "smar-jbeil", emoji: "🌳" },
+  { name: "Tannourine", slug: "tannourine", emoji: "❄️" },
+  { name: "Other", slug: "other", emoji: "📍" },
+] as const;
+
+export type AreaSlug = (typeof BATROUN_AREAS)[number]["slug"];
+export const AREA_NAMES = BATROUN_AREAS.map((a) => a.name);
+
 // ─── Amenity labels ─────────────────────────────────────────
 // Maps amenity keys to display labels and optional emoji.
 // Used for filters, listing details, and search.
@@ -61,7 +81,7 @@ export const AMENITY_FILTER_LABELS: Record<AmenityFilterKey, string> = {
 
 // ─── Site config ────────────────────────────────────────────
 export const SITE = {
-  name: "Manzeli",
+  name: "BNBatroun",
   tagline: "Your home away from home in Lebanon",
   description:
     "Find and book the best chalets, villas, and vacation homes across Lebanon. From Batroun beachfront to mountain retreats.",
