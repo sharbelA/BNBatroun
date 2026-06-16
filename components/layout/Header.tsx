@@ -8,6 +8,8 @@ import { Icon, Container } from "@/components/ui";
 import { getCurrentUser } from "@/app/_actions/auth";
 import { SITE } from "@/lib/constants";
 import UserMenu from "./UserMenu";
+import SearchBarDesktop from "./SearchBarDesktop";
+import SearchBarMobile from "./SearchBarMobile";
 
 export default async function Header() {
   const user = await getCurrentUser();
@@ -29,21 +31,7 @@ export default async function Header() {
             </span>
           </Link>
 
-          <Link
-            href="/chalets"
-            className="hidden md:flex items-center border border-[var(--border)] rounded-full px-2 py-2 transition-all duration-200 hover:shadow-[var(--card-shadow)] hover:border-[var(--accent)]/30"
-          >
-            <span className="px-4 text-sm font-medium border-r border-[var(--border)]">
-              Batroun
-            </span>
-            <span className="px-4 text-sm font-medium border-r border-[var(--border)]">
-              Any week
-            </span>
-            <span className="px-4 text-sm text-[var(--muted)]">Add guests</span>
-            <div className="ml-2 w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center">
-              <Icon name="search" size={14} stroke="white" strokeWidth={3} />
-            </div>
-          </Link>
+          <SearchBarDesktop />
 
           <div className="flex items-center gap-1 shrink-0">
             <Link
@@ -67,18 +55,7 @@ export default async function Header() {
           </div>
         </div>
 
-        <Link
-          href="/chalets"
-          className="md:hidden w-full flex items-center gap-3 border border-[var(--border)] rounded-full px-4 py-3 bg-white mb-4 transition-shadow duration-200 hover:shadow-[var(--card-shadow)]"
-        >
-          <Icon name="search" size={18} strokeWidth={2.5} />
-          <div className="text-left">
-            <p className="text-sm font-semibold leading-tight">Where to?</p>
-            <p className="text-xs text-[var(--muted)] leading-tight mt-0.5">
-              Browse chalets in Batroun
-            </p>
-          </div>
-        </Link>
+        <SearchBarMobile />
       </Container>
     </header>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   AMENITY_FILTER_KEYS,
@@ -25,12 +25,28 @@ function parseList(value: string | null): string[] {
   return value ? value.split(",").filter(Boolean) : [];
 }
 
-export default function Filters({ resultCount }: { resultCount: number }) {
+export default function Filters({
+  resultCount,
+  basePath,
+  panelOnly = false,
+}: {
+  resultCount: number;
+  basePath?: string;
+  panelOnly?: boolean;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const target = basePath ?? pathname;
+
+  useEffect(() => {
+    if (searchParams.get("filters") === "open") {
+      setSheetOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const amenities = parseList(searchParams.get("amenities")) as AmenityFilterKey[];
   const area = searchParams.get("area") ?? "";
@@ -44,12 +60,13 @@ export default function Filters({ resultCount }: { resultCount: number }) {
 
   function update(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
+    params.delete("filters");
     for (const [key, value] of Object.entries(updates)) {
       if (value === null || value === "") params.delete(key);
       else params.set(key, value);
     }
     startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      router.push(`${target}?${params.toString()}`, { scroll: false });
     });
   }
 
@@ -61,7 +78,7 @@ export default function Filters({ resultCount }: { resultCount: number }) {
   }
 
   function reset() {
-    router.push(pathname, { scroll: false });
+    router.push(target, { scroll: false });
     setSheetOpen(false);
   }
 
@@ -205,6 +222,8 @@ export default function Filters({ resultCount }: { resultCount: number }) {
       )}
     </div>
   );
+
+  if (panelOnly) return <div>{panel}</div>;
 
   return (
     <div className="mb-10">
