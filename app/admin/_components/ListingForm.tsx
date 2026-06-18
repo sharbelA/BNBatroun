@@ -156,7 +156,7 @@ export default function ListingForm({
               name="price"
               type="number"
               min={1}
-              step="0.01"
+              step="1"
               required
               defaultValue={listing?.price ?? ""}
               className={inputCls}

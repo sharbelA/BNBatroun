@@ -48,7 +48,7 @@ function parseFormData(formData: FormData) {
     slug,
     description: formData.get("description") as string,
     location: (formData.get("location") as string) || "Batroun",
-    price: parseFloat(formData.get("price") as string),
+    price: Math.round(parseInt(formData.get("price") as string, 10)),
     bedrooms: parseInt(formData.get("bedrooms") as string) || 1,
     bathrooms: parseInt(formData.get("bathrooms") as string) || 1,
     max_guests: parseInt(formData.get("max_guests") as string) || 2,
@@ -93,6 +93,10 @@ export async function createListingAction(
 
   const hostId = (formData.get("host_id") as string) || user.id;
   const fields = parseFormData(formData);
+
+  if (!Number.isInteger(fields.price) || fields.price < 1) {
+    return { error: "Price must be a positive whole number (e.g. 60)." };
+  }
 
   const { error } = await supabase.from("listings").insert({
     host_id: hostId,
@@ -150,6 +154,10 @@ export async function updateListingAction(
   }
 
   const fields = parseFormData(formData);
+
+  if (!Number.isInteger(fields.price) || fields.price < 1) {
+    return { error: "Price must be a positive whole number (e.g. 60)." };
+  }
 
   const { error } = await supabase
     .from("listings")
