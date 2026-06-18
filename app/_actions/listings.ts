@@ -67,7 +67,7 @@ function parseFormData(formData: FormData) {
 
 // ─── Create ─────────────────────────────────────────────────
 
-export type ActionState = { error: string | null; success?: boolean };
+export type ActionState = { error: string | null; success?: boolean; message?: string };
 
 export async function createListingAction(
   _prev: ActionState,
@@ -159,9 +159,19 @@ export async function updateListingAction(
     return { error: "Price must be a positive whole number (e.g. 60)." };
   }
 
+  // Only admins may reassign host_id
+  const newHostId =
+    profile.role === "admin"
+      ? (formData.get("host_id") as string) || undefined
+      : undefined;
+
+  const updatePayload = newHostId
+    ? { ...fields, host_id: newHostId }
+    : fields;
+
   const { error } = await supabase
     .from("listings")
-    .update(fields)
+    .update(updatePayload)
     .eq("id", id);
 
   if (error) {
@@ -174,7 +184,21 @@ export async function updateListingAction(
   revalidatePath("/admin/listings");
   revalidatePath(`/chalets/${fields.slug}`);
   revalidatePath("/");
-  return { error: null, success: true };
+
+  // Include host name in success message when reassignment happened
+  if (newHostId) {
+    const { data: hostProfile } = await supabase
+      .from("profiles")
+      .select("name")
+      .eq("id", newHostId)
+      .single();
+    const hostName = (hostProfile as { name: string } | null)?.name;
+    if (hostName) {
+      return { error: null, success: true, message: `Chalet reassigned to ${hostName}.` };
+    }
+  }
+
+  return { error: null, success: true, message: "Changes saved successfully." };
 }
 
 // ─── Delete ─────────────────────────────────────────────────

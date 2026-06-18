@@ -32,12 +32,12 @@ export async function getAdminListings(): Promise<AdminListing[]> {
 
 export async function getAdminListingById(
   id: string
-): Promise<Listing | null> {
+): Promise<AdminListing | null> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("listings")
-    .select("*")
+    .select("*, profiles!listings_host_id_fkey(name)")
     .eq("id", id)
     .single();
 
@@ -46,17 +46,21 @@ export async function getAdminListingById(
     return null;
   }
 
-  return data as Listing;
+  return {
+    ...(data as Listing),
+    host_name:
+      (data.profiles as { name: string } | null)?.name ?? "Unknown",
+  };
 }
 
 export async function getHosts(): Promise<
-  Pick<Profile, "id" | "name">[]
+  Pick<Profile, "id" | "name" | "role">[]
 > {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name")
+    .select("id, name, role")
     .in("role", ["host", "admin"])
     .order("name");
 
@@ -65,7 +69,7 @@ export async function getHosts(): Promise<
     return [];
   }
 
-  return (data ?? []) as Pick<Profile, "id" | "name">[];
+  return (data ?? []) as Pick<Profile, "id" | "name" | "role">[];
 }
 
 export type HostWithListingCount = Profile & { listing_count: number };
