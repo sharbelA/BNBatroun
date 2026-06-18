@@ -95,6 +95,9 @@ export async function createListingAction(
   const hostId = (formData.get("host_id") as string) || user.id;
   const fields = parseFormData(formData);
 
+  if (!fields.slug) {
+    return { error: "A URL slug is required. Auto-generation failed (title may contain only non-Latin characters). Please type a slug manually, e.g. \"my-chalet\"." };
+  }
   if (!Number.isInteger(fields.price) || fields.price < 1) {
     return { error: "Weekday price must be a positive whole number (e.g. 60)." };
   }
@@ -159,6 +162,9 @@ export async function updateListingAction(
 
   const fields = parseFormData(formData);
 
+  if (!fields.slug) {
+    return { error: "A URL slug is required. Auto-generation failed (title may contain only non-Latin characters). Please type a slug manually, e.g. \"my-chalet\"." };
+  }
   if (!Number.isInteger(fields.price) || fields.price < 1) {
     return { error: "Weekday price must be a positive whole number (e.g. 60)." };
   }

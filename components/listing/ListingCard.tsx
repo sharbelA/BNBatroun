@@ -18,7 +18,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   const images = listing.images ?? [];
 
   return (
-    <Link href={`/chalets/${listing.slug}`} className="group block card-hover">
+    <Link href={listing.slug ? `/chalets/${listing.slug}` : "/chalets"} className="group block card-hover">
       <div className="relative overflow-hidden rounded-2xl border border-[var(--border-light)]">
         {images.length > 0 ? (
           <div className="img-zoom">
