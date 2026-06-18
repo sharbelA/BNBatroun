@@ -288,6 +288,9 @@ export default function AvailabilityCalendar({
             blocked: blockedDates,
             selected: selectedDates,
           }}
+          modifiersClassNames={{
+            blocked: "rdp-blocked",
+          }}
           modifiersStyles={{
             booked: {
               backgroundColor: "#fee2e2",
@@ -296,8 +299,8 @@ export default function AvailabilityCalendar({
               borderRadius: "10px",
             },
             blocked: {
-              backgroundColor: "#f3f4f6",
-              color: "#6b7280",
+              backgroundColor: "#e5e7eb",
+              color: "#4b5563",
               borderRadius: "10px",
             },
             selected: {
@@ -340,7 +343,7 @@ export default function AvailabilityCalendar({
         {(mode !== "readonly" || bookedDates.length > 0) && (
           <LegendDot color="#fee2e2" border="#fca5a5" label="Booked" />
         )}
-        <LegendDot color="#f3f4f6" border="#d1d5db" label="Blocked" />
+        <LegendDot color="#e5e7eb" border="#9ca3af" label="Blocked" />
       </div>
 
       {/* Saving spinner */}
@@ -777,6 +780,10 @@ function CalendarStyles() {
       .rdp-day:hover { transform: scale(1.06); }
       .rdp-day.rdp-disabled { cursor: not-allowed; opacity: 0.4; }
       .rdp-day.rdp-disabled:hover { transform: none; }
+      .rdp-blocked .rdp-day_button {
+        text-decoration: line-through;
+        text-decoration-thickness: 2px;
+      }
       .rdp-button_previous, .rdp-button_next {
         border-radius: 10px;
         transition: background 0.15s;
