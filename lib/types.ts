@@ -9,6 +9,7 @@ export interface Listing {
   description: string;
   location: string;
   price: number;
+  weekend_price: number;
   bedrooms: number;
   bathrooms: number;
   max_guests: number;

@@ -162,8 +162,8 @@ export default function ListingForm({
         <h2 className="text-sm font-semibold uppercase tracking-widest text-warm-500">
           Pricing &amp; capacity
         </h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Field label="Price / night ($)" htmlFor="price">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Weekday price ($)" htmlFor="price" hint="Mon–Thu">
             <input
               id="price"
               name="price"
@@ -175,6 +175,20 @@ export default function ListingForm({
               className={inputCls}
             />
           </Field>
+          <Field label="Weekend price ($)" htmlFor="weekend_price" hint="Fri–Sun">
+            <input
+              id="weekend_price"
+              name="weekend_price"
+              type="number"
+              min={1}
+              step="1"
+              required
+              defaultValue={listing?.weekend_price ?? listing?.price ?? ""}
+              className={inputCls}
+            />
+          </Field>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
           <Field label="Bedrooms" htmlFor="bedrooms">
             <input
               id="bedrooms"

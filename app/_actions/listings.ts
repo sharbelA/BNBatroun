@@ -49,6 +49,7 @@ function parseFormData(formData: FormData) {
     description: formData.get("description") as string,
     location: (formData.get("location") as string) || "Batroun",
     price: Math.round(parseInt(formData.get("price") as string, 10)),
+    weekend_price: Math.round(parseInt(formData.get("weekend_price") as string, 10)),
     bedrooms: parseInt(formData.get("bedrooms") as string) || 1,
     bathrooms: parseInt(formData.get("bathrooms") as string) || 1,
     max_guests: parseInt(formData.get("max_guests") as string) || 2,
@@ -95,7 +96,10 @@ export async function createListingAction(
   const fields = parseFormData(formData);
 
   if (!Number.isInteger(fields.price) || fields.price < 1) {
-    return { error: "Price must be a positive whole number (e.g. 60)." };
+    return { error: "Weekday price must be a positive whole number (e.g. 60)." };
+  }
+  if (!Number.isInteger(fields.weekend_price) || fields.weekend_price < 1) {
+    return { error: "Weekend price must be a positive whole number (e.g. 80)." };
   }
 
   const { error } = await supabase.from("listings").insert({
@@ -156,7 +160,10 @@ export async function updateListingAction(
   const fields = parseFormData(formData);
 
   if (!Number.isInteger(fields.price) || fields.price < 1) {
-    return { error: "Price must be a positive whole number (e.g. 60)." };
+    return { error: "Weekday price must be a positive whole number (e.g. 60)." };
+  }
+  if (!Number.isInteger(fields.weekend_price) || fields.weekend_price < 1) {
+    return { error: "Weekend price must be a positive whole number (e.g. 80)." };
   }
 
   // Only admins may reassign host_id

@@ -31,7 +31,7 @@ function toListing(row: DbListing & { listing_images?: ImageRow[] }): Listing {
   const images = (row.listing_images ?? [])
     .sort((a, b) => a.display_order - b.display_order)
     .map((i) => i.url);
-  return { ...row, images };
+  return { ...row, images, weekend_price: row.weekend_price ?? row.price };
 }
 
 export async function getListings(options: { featured?: boolean; limit?: number } = {}): Promise<Listing[]> {
