@@ -68,7 +68,7 @@ function parseFormData(formData: FormData) {
 
 // ─── Create ─────────────────────────────────────────────────
 
-export type ActionState = { error: string | null; success?: boolean; message?: string };
+export type ActionState = { error: string | null; success?: boolean; message?: string; generatedPassword?: string };
 
 export async function createListingAction(
   _prev: ActionState,

@@ -3,7 +3,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import type { ActionState } from "@/app/_actions/listings";
 
 // ─── Service-role client ────────────────────────────────────
@@ -16,6 +15,24 @@ function createServiceRoleClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
+}
+
+// ─── Password generation ─────────────────────────────────────
+// Derives a memorable prefix from the host's first name and appends
+// 6 cryptographically random alphanumeric characters.
+
+function generateHostPassword(fullName: string): string {
+  const firstName = (fullName.split(/\s+/)[0] ?? "")
+    .toLowerCase()
+    .replace(/[^a-z]/g, "");
+  const prefix = firstName || "host";
+
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  const suffix = Array.from(bytes, (b) => chars[b % chars.length]).join("");
+
+  return prefix + suffix;
 }
 
 // ─── Create host ────────────────────────────────────────────
@@ -43,16 +60,14 @@ export async function createHostAction(
 
   const name = (formData.get("name") as string)?.trim();
   const email = (formData.get("email") as string)?.trim();
-  const password = formData.get("password") as string;
   const phone = (formData.get("phone") as string)?.trim() || null;
   const whatsapp = (formData.get("whatsapp") as string)?.trim() || phone;
 
-  if (!name || !email || !password) {
-    return { error: "Name, email, and password are required" };
+  if (!name || !email) {
+    return { error: "Name and email are required" };
   }
-  if (password.length < 6) {
-    return { error: "Password must be at least 6 characters" };
-  }
+
+  const password = generateHostPassword(name);
 
   const admin = createServiceRoleClient();
 
@@ -61,7 +76,7 @@ export async function createHostAction(
       email,
       password,
       email_confirm: true,
-      user_metadata: { name, role: 'host' },
+      user_metadata: { name, role: "host" },
     });
 
   if (createError) return { error: createError.message };
@@ -82,5 +97,5 @@ export async function createHostAction(
   }
 
   revalidatePath("/admin/hosts");
-  redirect("/admin/hosts?created=1");
+  return { error: null, success: true, generatedPassword: password };
 }
