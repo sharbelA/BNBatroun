@@ -48,7 +48,8 @@ function parseFormData(formData: FormData) {
     slug,
     description: formData.get("description") as string,
     location: (formData.get("location") as string) || "Batroun",
-    price: parseFloat(formData.get("price") as string),
+    price: Math.round(parseInt(formData.get("price") as string, 10)),
+    weekend_price: Math.round(parseInt(formData.get("weekend_price") as string, 10)),
     bedrooms: parseInt(formData.get("bedrooms") as string) || 1,
     bathrooms: parseInt(formData.get("bathrooms") as string) || 1,
     max_guests: parseInt(formData.get("max_guests") as string) || 2,
@@ -67,7 +68,7 @@ function parseFormData(formData: FormData) {
 
 // ─── Create ─────────────────────────────────────────────────
 
-export type ActionState = { error: string | null; success?: boolean };
+export type ActionState = { error: string | null; success?: boolean; message?: string; generatedPassword?: string };
 
 export async function createListingAction(
   _prev: ActionState,
@@ -93,6 +94,16 @@ export async function createListingAction(
 
   const hostId = (formData.get("host_id") as string) || user.id;
   const fields = parseFormData(formData);
+
+  if (!fields.slug) {
+    return { error: "A URL slug is required. Auto-generation failed (title may contain only non-Latin characters). Please type a slug manually, e.g. \"my-chalet\"." };
+  }
+  if (!Number.isInteger(fields.price) || fields.price < 1) {
+    return { error: "Weekday price must be a positive whole number (e.g. 60)." };
+  }
+  if (!Number.isInteger(fields.weekend_price) || fields.weekend_price < 1) {
+    return { error: "Weekend price must be a positive whole number (e.g. 80)." };
+  }
 
   const { error } = await supabase.from("listings").insert({
     host_id: hostId,
@@ -151,9 +162,29 @@ export async function updateListingAction(
 
   const fields = parseFormData(formData);
 
+  if (!fields.slug) {
+    return { error: "A URL slug is required. Auto-generation failed (title may contain only non-Latin characters). Please type a slug manually, e.g. \"my-chalet\"." };
+  }
+  if (!Number.isInteger(fields.price) || fields.price < 1) {
+    return { error: "Weekday price must be a positive whole number (e.g. 60)." };
+  }
+  if (!Number.isInteger(fields.weekend_price) || fields.weekend_price < 1) {
+    return { error: "Weekend price must be a positive whole number (e.g. 80)." };
+  }
+
+  // Only admins may reassign host_id
+  const newHostId =
+    profile.role === "admin"
+      ? (formData.get("host_id") as string) || undefined
+      : undefined;
+
+  const updatePayload = newHostId
+    ? { ...fields, host_id: newHostId }
+    : fields;
+
   const { error } = await supabase
     .from("listings")
-    .update(fields)
+    .update(updatePayload)
     .eq("id", id);
 
   if (error) {
@@ -166,7 +197,21 @@ export async function updateListingAction(
   revalidatePath("/admin/listings");
   revalidatePath(`/chalets/${fields.slug}`);
   revalidatePath("/");
-  return { error: null, success: true };
+
+  // Include host name in success message when reassignment happened
+  if (newHostId) {
+    const { data: hostProfile } = await supabase
+      .from("profiles")
+      .select("name")
+      .eq("id", newHostId)
+      .single();
+    const hostName = (hostProfile as { name: string } | null)?.name;
+    if (hostName) {
+      return { error: null, success: true, message: `Chalet reassigned to ${hostName}.` };
+    }
+  }
+
+  return { error: null, success: true, message: "Changes saved successfully." };
 }
 
 // ─── Delete ─────────────────────────────────────────────────

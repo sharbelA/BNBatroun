@@ -12,6 +12,7 @@ import {
   startOfDay,
   parseISO,
   eachDayOfInterval,
+  getDay,
 } from "date-fns";
 import { Icon } from "@/components/ui";
 
@@ -27,14 +28,23 @@ interface AvailabilityEntry {
 
 interface BookingCardProps {
   price: number;
+  weekendPrice: number;
   maxGuests: number;
   title: string;
   slug: string;
   availability?: AvailabilityEntry[];
 }
 
+// getDay: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+// Weekend = Fri(5), Sat(6), Sun(0)
+function isWeekendNight(date: Date): boolean {
+  const d = getDay(date);
+  return d === 0 || d === 5 || d === 6;
+}
+
 export default function BookingCard({
   price,
+  weekendPrice,
   maxGuests,
   title,
   slug,
@@ -112,7 +122,20 @@ export default function BookingCard({
     return Math.max(0, differenceInDays(checkOut, checkIn));
   }, [checkIn, checkOut]);
 
-  const total = nights * price;
+  const { weekdayNights, weekendNights, total } = useMemo(() => {
+    if (!checkIn || nights === 0) return { weekdayNights: 0, weekendNights: 0, total: 0 };
+    let weekday = 0;
+    let weekend = 0;
+    for (let i = 0; i < nights; i++) {
+      if (isWeekendNight(addDays(checkIn, i))) weekend++;
+      else weekday++;
+    }
+    return {
+      weekdayNights: weekday,
+      weekendNights: weekend,
+      total: weekday * price + weekend * weekendPrice,
+    };
+  }, [checkIn, nights, price, weekendPrice]);
 
   // Check if any unavailable date falls within the selected range
   const rangeConflict = useMemo(() => {
@@ -123,17 +146,23 @@ export default function BookingCard({
 
   const whatsappUrl = useMemo(() => {
     if (!checkIn || !checkOut || nights === 0 || rangeConflict) return null;
+    const nightsDetail =
+      weekdayNights > 0 && weekendNights > 0
+        ? `${nights} (${weekdayNights} weekday, ${weekendNights} weekend)`
+        : weekendNights > 0
+          ? `${nights} weekend`
+          : `${nights} weekday`;
     const message = encodeURIComponent(
       `Hi! I'm interested in booking *${title}*\n\n` +
         `📅 Check-in: ${format(checkIn, "MMM d, yyyy")}\n` +
         `📅 Check-out: ${format(checkOut, "MMM d, yyyy")}\n` +
-        `🌙 Nights: ${nights}\n` +
+        `🌙 Nights: ${nightsDetail}\n` +
         `👥 Guests: ${guests}\n` +
         `💰 Total: $${total.toLocaleString()}\n\n` +
         `Listing: ${SITE_URL}/chalets/${slug}`
     );
     return `https://wa.me/${WA_NUMBER}?text=${message}`;
-  }, [checkIn, checkOut, guests, nights, total, title, slug, rangeConflict]);
+  }, [checkIn, checkOut, guests, nights, weekdayNights, weekendNights, total, title, slug, rangeConflict]);
 
   // Range modifiers for DayPicker
   const modifiers = useMemo(
@@ -172,8 +201,17 @@ export default function BookingCard({
 
       {/* ── Price ── */}
       <div className="pb-4 mb-4 border-b border-[var(--border-light)]">
-        <span className="text-2xl font-bold text-[var(--accent)]">${price.toLocaleString()}</span>
-        <span className="text-[var(--muted)] text-sm ml-1">/ night</span>
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-bold text-[var(--accent)]">${price.toLocaleString()}</span>
+          <span className="text-[var(--muted)] text-sm">
+            {weekendPrice !== price ? "/ weeknight" : "/ night"}
+          </span>
+        </div>
+        {weekendPrice !== price && (
+          <p className="text-sm text-[var(--muted)] mt-0.5">
+            ${weekendPrice.toLocaleString()} / weekend night
+          </p>
+        )}
       </div>
 
       {/* ── Date triggers ── */}
@@ -313,14 +351,26 @@ export default function BookingCard({
       {/* ── Price breakdown ── */}
       {nights > 0 && (
         <div className="border-t border-[var(--border-light)] pt-4 mb-4 space-y-2 text-sm">
-          <div className="flex justify-between text-[var(--muted)]">
-            <span>
-              ${price.toLocaleString()} × {nights} night{nights !== 1 ? "s" : ""}
-            </span>
-            <span className="text-[var(--foreground)] font-medium">
-              ${total.toLocaleString()}
-            </span>
-          </div>
+          {weekendNights > 0 && (
+            <div className="flex justify-between text-[var(--muted)]">
+              <span>
+                {weekendNights} weekend night{weekendNights !== 1 ? "s" : ""} × ${weekendPrice.toLocaleString()}
+              </span>
+              <span className="text-[var(--foreground)] font-medium">
+                ${(weekendNights * weekendPrice).toLocaleString()}
+              </span>
+            </div>
+          )}
+          {weekdayNights > 0 && (
+            <div className="flex justify-between text-[var(--muted)]">
+              <span>
+                {weekdayNights} weekday night{weekdayNights !== 1 ? "s" : ""} × ${price.toLocaleString()}
+              </span>
+              <span className="text-[var(--foreground)] font-medium">
+                ${(weekdayNights * price).toLocaleString()}
+              </span>
+            </div>
+          )}
           <div className="flex justify-between font-bold text-base pt-3 border-t border-[var(--border-light)]">
             <span>Total</span>
             <span>${total.toLocaleString()}</span>

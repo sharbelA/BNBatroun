@@ -83,7 +83,7 @@ export default function AvailabilityCalendar({
   const dragRef = useRef<{ start: string; dragging: boolean } | null>(null);
 
   /* ─── Compute date arrays for modifiers ─── */
-  const { bookedDates, blockedDates, selectedDates } = useMemo(() => {
+  const { bookedDates, blockedDates, selectedDates, unavailableDates } = useMemo(() => {
     const booked: Date[] = [];
     const blocked: Date[] = [];
     for (const [dateStr, entry] of Object.entries(statusMap)) {
@@ -92,7 +92,12 @@ export default function AvailabilityCalendar({
       else blocked.push(d);
     }
     const selected = (selection ?? []).map((s) => parseISO(s));
-    return { bookedDates: booked, blockedDates: blocked, selectedDates: selected };
+    return {
+      bookedDates: booked,
+      blockedDates: blocked,
+      selectedDates: selected,
+      unavailableDates: [...booked, ...blocked],
+    };
   }, [statusMap, selection]);
 
   /* ─── Counts ─── */
@@ -253,15 +258,15 @@ export default function AvailabilityCalendar({
             <StatBadge
               count={counts.booked}
               label="Booked"
-              color="#dc2626"
-              bg="#fee2e2"
+              color="#991b1b"
+              bg="#fecaca"
             />
           )}
           <StatBadge
             count={counts.blocked}
             label="Blocked"
-            color="#6b7280"
-            bg="#f3f4f6"
+            color="#854d0e"
+            bg="#fde68a"
           />
         </div>
       )}
@@ -283,30 +288,47 @@ export default function AvailabilityCalendar({
           endMonth={addMonths(startOfMonth(today), 2)}
           disabled={{ before: today }}
           showOutsideDays={false}
-          modifiers={{
-            booked: bookedDates,
-            blocked: blockedDates,
-            selected: selectedDates,
-          }}
-          modifiersStyles={{
-            booked: {
-              backgroundColor: "#fee2e2",
-              color: "#b91c1c",
-              fontWeight: 600,
-              borderRadius: "10px",
-            },
-            blocked: {
-              backgroundColor: "#f3f4f6",
-              color: "#6b7280",
-              borderRadius: "10px",
-            },
-            selected: {
-              outline: "2.5px solid var(--accent, #c4582a)",
-              outlineOffset: "-2px",
-              borderRadius: "10px",
-              boxShadow: "0 0 0 3px var(--accent-light, #fef4f0)",
-            },
-          }}
+          modifiers={
+            mode === "readonly"
+              ? { unavailable: unavailableDates }
+              : { booked: bookedDates, blocked: blockedDates, selected: selectedDates }
+          }
+          modifiersClassNames={
+            mode === "readonly"
+              ? { unavailable: "rdp-unavailable" }
+              : { booked: "rdp-booked", blocked: "rdp-blocked" }
+          }
+          modifiersStyles={
+            mode === "readonly"
+              ? {
+                  unavailable: {
+                    backgroundColor: "#fecaca",
+                    color: "#991b1b",
+                    borderRadius: "10px",
+                    fontWeight: 600,
+                  },
+                }
+              : {
+                  booked: {
+                    backgroundColor: "#fecaca",
+                    color: "#991b1b",
+                    borderRadius: "10px",
+                    fontWeight: 600,
+                  },
+                  blocked: {
+                    backgroundColor: "#fde68a",
+                    color: "#854d0e",
+                    borderRadius: "10px",
+                    fontWeight: 600,
+                  },
+                  selected: {
+                    outline: "2.5px solid var(--accent, #c4582a)",
+                    outlineOffset: "-2px",
+                    borderRadius: "10px",
+                    boxShadow: "0 0 0 3px var(--accent-light, #fef4f0)",
+                  },
+                }
+          }
           components={
             interactive
               ? {
@@ -336,11 +358,15 @@ export default function AvailabilityCalendar({
           borderRadius: "12px",
         }}
       >
-        <LegendDot color="#ffffff" border="#d6d3d1" label="Available (default)" />
-        {(mode !== "readonly" || bookedDates.length > 0) && (
-          <LegendDot color="#fee2e2" border="#fca5a5" label="Booked" />
+        <LegendDot color="#dcfce7" border="#86efac" label="Available" />
+        {mode === "readonly" ? (
+          <LegendDot color="#fecaca" border="#fca5a5" label="Unavailable" />
+        ) : (
+          <>
+            <LegendDot color="#fecaca" border="#fca5a5" label="Booked" />
+            <LegendDot color="#fde68a" border="#fbbf24" label="Blocked" />
+          </>
         )}
-        <LegendDot color="#f3f4f6" border="#d1d5db" label="Blocked" />
       </div>
 
       {/* Saving spinner */}
@@ -572,11 +598,11 @@ function SelectionPopup({
           {/* Block */}
           <PopupActionButton
             label="Block these dates"
-            dotColor="#9ca3af"
-            borderColor="#d1d5db"
-            bgColor="#f9fafb"
-            bgHover="#f3f4f6"
-            textColor="#374151"
+            dotColor="#d97706"
+            borderColor="#fbbf24"
+            bgColor="#fffbeb"
+            bgHover="#fef3c7"
+            textColor="#854d0e"
             onClick={() => onSetStatus(dates, "blocked", note.trim() || null)}
           />
 
@@ -584,11 +610,11 @@ function SelectionPopup({
           {mode === "admin" && (
             <PopupActionButton
               label="Mark as booked"
-              dotColor="#dc2626"
+              dotColor="#f43f5e"
               borderColor="#fca5a5"
-              bgColor="#fef2f2"
-              bgHover="#fee2e2"
-              textColor="#b91c1c"
+              bgColor="#fff1f2"
+              bgHover="#fecaca"
+              textColor="#991b1b"
               onClick={() => onSetStatus(dates, "booked", note.trim() || null)}
             />
           )}
@@ -777,6 +803,10 @@ function CalendarStyles() {
       .rdp-day:hover { transform: scale(1.06); }
       .rdp-day.rdp-disabled { cursor: not-allowed; opacity: 0.4; }
       .rdp-day.rdp-disabled:hover { transform: none; }
+      /* Available — all non-special, non-disabled days (targets the <td> directly) */
+      .rdp-day:not(.rdp-disabled):not(.rdp-booked):not(.rdp-blocked):not(.rdp-unavailable) {
+        background-color: #dcfce7; color: #166534; border-radius: 10px;
+      }
       .rdp-button_previous, .rdp-button_next {
         border-radius: 10px;
         transition: background 0.15s;

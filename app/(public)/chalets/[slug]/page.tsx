@@ -257,6 +257,7 @@ export default async function ChaletDetailPage(
               <div className="sticky top-[calc(var(--header-height)+24px)]">
                 <BookingCard
                   price={listing.price}
+                  weekendPrice={listing.weekend_price ?? listing.price}
                   maxGuests={listing.max_guests}
                   title={listing.title}
                   slug={listing.slug}
@@ -270,6 +271,7 @@ export default async function ChaletDetailPage(
         {/* ── Mobile booking bar ─────────────────────── */}
         <MobileBookingBar
           price={listing.price}
+          weekendPrice={listing.weekend_price ?? listing.price}
           maxGuests={listing.max_guests}
           title={listing.title}
           slug={listing.slug}

@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import type { Listing, Profile } from "@/lib/supabase/types";
+import type { Profile } from "@/lib/supabase/types";
+import type { AdminListing } from "@/lib/supabase/queries/admin";
 import {
   createListingAction,
   updateListingAction,
@@ -22,8 +23,8 @@ const AMENITIES = [
 ] as const;
 
 interface ListingFormProps {
-  listing?: Listing | null;
-  hosts?: Pick<Profile, "id" | "name">[];
+  listing?: AdminListing | null;
+  hosts?: Pick<Profile, "id" | "name" | "role">[];
   mode: "create" | "edit";
 }
 
@@ -50,27 +51,39 @@ export default function ListingForm({
       )}
       {state.success && (
         <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
-          Changes saved successfully.
+          {state.message ?? "Changes saved successfully."}
         </div>
       )}
 
-      {/* ── Host selector (create only) ─────────── */}
-      {mode === "create" && hosts && hosts.length > 0 && (
+      {/* ── Host selector ─────────────────────── */}
+      {hosts && hosts.length > 0 && (
         <section className="flex flex-col gap-4">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-warm-500">
             Host
           </h2>
-          <Field label="Assign to host" htmlFor="host_id">
+          {mode === "edit" && listing?.host_name && (
+            <p className="text-xs text-warm-500">
+              Currently assigned to{" "}
+              <span className="font-semibold text-warm-800">
+                {listing.host_name}
+              </span>
+            </p>
+          )}
+          <Field
+            label={mode === "edit" ? "Reassign to host" : "Assign to host"}
+            htmlFor="host_id"
+          >
             <select
               id="host_id"
               name="host_id"
               className={inputCls}
-              defaultValue=""
+              defaultValue={listing?.host_id ?? ""}
             >
-              <option value="">Me (admin)</option>
+              {mode === "create" && <option value="">Me (admin)</option>}
               {hosts.map((h) => (
                 <option key={h.id} value={h.id}>
                   {h.name}
+                  {h.role === "admin" ? " (Admin)" : ""}
                 </option>
               ))}
             </select>
@@ -149,19 +162,33 @@ export default function ListingForm({
         <h2 className="text-sm font-semibold uppercase tracking-widest text-warm-500">
           Pricing &amp; capacity
         </h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Field label="Price / night ($)" htmlFor="price">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Weekday price ($)" htmlFor="price" hint="Mon–Thu">
             <input
               id="price"
               name="price"
               type="number"
               min={1}
-              step="0.01"
+              step="1"
               required
               defaultValue={listing?.price ?? ""}
               className={inputCls}
             />
           </Field>
+          <Field label="Weekend price ($)" htmlFor="weekend_price" hint="Fri–Sun">
+            <input
+              id="weekend_price"
+              name="weekend_price"
+              type="number"
+              min={1}
+              step="1"
+              required
+              defaultValue={listing?.weekend_price ?? listing?.price ?? ""}
+              className={inputCls}
+            />
+          </Field>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
           <Field label="Bedrooms" htmlFor="bedrooms">
             <input
               id="bedrooms"

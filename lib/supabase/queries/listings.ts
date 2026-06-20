@@ -31,7 +31,7 @@ function toListing(row: DbListing & { listing_images?: ImageRow[] }): Listing {
   const images = (row.listing_images ?? [])
     .sort((a, b) => a.display_order - b.display_order)
     .map((i) => i.url);
-  return { ...row, images };
+  return { ...row, images, weekend_price: row.weekend_price ?? row.price };
 }
 
 export async function getListings(options: { featured?: boolean; limit?: number } = {}): Promise<Listing[]> {
@@ -40,7 +40,9 @@ export async function getListings(options: { featured?: boolean; limit?: number 
   let query = supabase
     .from("listings")
     .select("*, listing_images(url, display_order)")
-    .eq("is_active", true);
+    .eq("is_active", true)
+    .not("slug", "is", null)
+    .neq("slug", "");
   if (options.featured) query = query.eq("is_featured", true);
   if (options.limit) query = query.limit(options.limit);
   query = query.order("created_at", { ascending: false });
@@ -83,7 +85,9 @@ export async function getFilteredListings(
   let query = supabase
     .from("listings")
     .select("*, listing_images(url, display_order)")
-    .eq("is_active", true);
+    .eq("is_active", true)
+    .not("slug", "is", null)
+    .neq("slug", "");
 
   for (const key of filters.amenities ?? []) {
     if (AMENITY_FILTER_KEYS.includes(key)) query = query.eq(key, true);

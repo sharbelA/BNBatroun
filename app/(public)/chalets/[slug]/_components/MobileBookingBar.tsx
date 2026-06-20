@@ -6,6 +6,7 @@ import BookingCard from "./BookingCard";
 
 interface MobileBookingBarProps {
   price: number;
+  weekendPrice: number;
   maxGuests: number;
   title: string;
   slug: string;
@@ -14,6 +15,7 @@ interface MobileBookingBarProps {
 
 export default function MobileBookingBar({
   price,
+  weekendPrice,
   maxGuests,
   title,
   slug,
@@ -26,6 +28,9 @@ export default function MobileBookingBar({
       {/* Fixed bottom bar */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[var(--border-light)] px-4 py-3 flex items-center justify-between gap-4 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
         <div>
+          {weekendPrice !== price && (
+            <span className="text-xs text-[var(--muted)] mr-0.5">From </span>
+          )}
           <span className="text-lg font-bold text-[var(--accent)]">${price.toLocaleString()}</span>
           <span className="text-[var(--muted)] text-sm ml-1">/ night</span>
         </div>
@@ -61,6 +66,7 @@ export default function MobileBookingBar({
             </div>
             <BookingCard
               price={price}
+              weekendPrice={weekendPrice}
               maxGuests={maxGuests}
               title={title}
               slug={slug}

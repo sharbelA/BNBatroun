@@ -18,7 +18,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   const images = listing.images ?? [];
 
   return (
-    <Link href={`/chalets/${listing.slug}`} className="group block card-hover">
+    <Link href={listing.slug ? `/chalets/${listing.slug}` : "/chalets"} className="group block card-hover">
       <div className="relative overflow-hidden rounded-2xl border border-[var(--border-light)]">
         {images.length > 0 ? (
           <div className="img-zoom">
@@ -61,6 +61,9 @@ export default function ListingCard({ listing }: { listing: Listing }) {
           {listing.max_guests} guest{listing.max_guests !== 1 ? "s" : ""}
         </p>
         <p className="mt-2">
+          {(listing.weekend_price ?? listing.price) !== listing.price && (
+            <span className="text-sm text-[var(--muted)] mr-0.5">From </span>
+          )}
           <span className="text-[15px] font-semibold text-[var(--foreground)]">
             {SITE.currencySymbol}
             {listing.price}

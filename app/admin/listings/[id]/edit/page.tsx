@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAdminListingById } from "@/lib/supabase/queries/admin";
+import { getAdminListingById, getHosts } from "@/lib/supabase/queries/admin";
 import ListingForm from "@/app/admin/_components/ListingForm";
 import DeleteListingButton from "@/app/admin/_components/DeleteListingButton";
 
@@ -11,7 +11,10 @@ export default async function EditListingPage(
   props: PageProps<"/admin/listings/[id]/edit">
 ) {
   const { id } = await props.params;
-  const listing = await getAdminListingById(id);
+  const [listing, hosts] = await Promise.all([
+    getAdminListingById(id),
+    getHosts(),
+  ]);
 
   if (!listing) notFound();
 
@@ -37,7 +40,7 @@ export default async function EditListingPage(
         Edit chalet
       </h1>
 
-      <ListingForm mode="edit" listing={listing} />
+      <ListingForm mode="edit" listing={listing} hosts={hosts} />
 
       {/* Danger zone */}
       <section className="mt-16 rounded-xl border border-red-200 bg-red-50 p-6">

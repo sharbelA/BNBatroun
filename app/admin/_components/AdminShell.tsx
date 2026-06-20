@@ -20,13 +20,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [signingOut, setSigningOut] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  // Login page gets no shell chrome — bare layout only
-  if (pathname === '/admin/login') return <>{children}</>
-
-  // Close the drawer whenever the route changes
+  // Close the drawer whenever the route changes (must be before any early return)
   useEffect(() => {
     setDrawerOpen(false)
   }, [pathname])
+
+  // Login page gets no shell chrome — bare layout only
+  if (pathname === '/admin/login') return <>{children}</>
 
   async function handleSignOut() {
     setSigningOut(true)

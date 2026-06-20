@@ -35,24 +35,11 @@ export default async function HostAvailabilityPage(
       </div>
 
       {/* Page header */}
-      <div
-        style={{
-          marginBottom: '32px',
-          paddingBottom: '24px',
-          borderBottom: '1px solid var(--border-light, #ebebeb)',
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '24px',
-            fontWeight: 700,
-            color: 'var(--foreground)',
-            marginBottom: '6px',
-          }}
-        >
+      <div className="mb-8 pb-6 border-b border-[var(--border-light)]">
+        <h1 className="text-2xl font-semibold text-[var(--foreground)] mb-1.5">
           {listing.title}
         </h1>
-        <p style={{ fontSize: '14px', color: 'var(--muted)' }}>
+        <p className="text-sm text-[var(--muted)]">
           Manage your chalet&apos;s availability calendar
         </p>
       </div>

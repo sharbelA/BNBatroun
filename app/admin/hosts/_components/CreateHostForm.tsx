@@ -7,17 +7,63 @@ import type { ActionState } from "@/app/_actions/listings";
 
 const initial: ActionState = { error: null };
 
-function generatePassword() {
-  return crypto.randomUUID().replace(/-/g, "").slice(0, 12);
-}
-
 export default function CreateHostForm() {
   const [state, formAction, isPending] = useActionState(
     createHostAction,
     initial
   );
-  const [password, setPassword] = useState("");
+  const [copied, setCopied] = useState(false);
 
+  async function copyPassword(pw: string) {
+    await navigator.clipboard.writeText(pw);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  // ── Success screen ────────────────────────────────────────
+  if (state.success && state.generatedPassword) {
+    return (
+      <div className="flex flex-col gap-5">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 text-base">
+            ✓
+          </span>
+          <p className="text-base font-semibold text-warm-900">
+            Host account created
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-warm-700">Generated password</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 rounded-xl border border-sand-200 bg-sand-50 px-4 py-2.5 font-mono text-sm tracking-wide text-warm-900 select-all">
+              {state.generatedPassword}
+            </code>
+            <button
+              type="button"
+              onClick={() => copyPassword(state.generatedPassword!)}
+              className="h-10 shrink-0 rounded-xl border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50 active:scale-95"
+            >
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Save this password and share it with the host — it won&apos;t be shown again.
+        </div>
+
+        <Link
+          href="/admin/hosts"
+          className="self-start text-sm font-medium text-[var(--accent)] hover:underline"
+        >
+          ← Back to hosts
+        </Link>
+      </div>
+    );
+  }
+
+  // ── Create form ───────────────────────────────────────────
   return (
     <form action={formAction} className="flex flex-col gap-6">
       {state.error && (
@@ -48,33 +94,6 @@ export default function CreateHostForm() {
         />
       </Field>
 
-      <Field
-        label="Password"
-        htmlFor="password"
-        hint="At least 6 characters. Generate one or set it manually."
-      >
-        <div className="flex gap-2">
-          <input
-            id="password"
-            name="password"
-            type="text"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Set a password"
-            className={inputCls}
-          />
-          <button
-            type="button"
-            onClick={() => setPassword(generatePassword())}
-            className="h-11 md:h-10 shrink-0 rounded-xl border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
-          >
-            Generate
-          </button>
-        </div>
-      </Field>
-
       <Field label="Phone number" htmlFor="phone">
         <input
           id="phone"
@@ -98,6 +117,10 @@ export default function CreateHostForm() {
           className={inputCls}
         />
       </Field>
+
+      <p className="rounded-xl border border-sand-200 bg-sand-50 px-4 py-3 text-xs text-warm-500">
+        A password will be auto-generated from the host&apos;s first name and shown to you once after creation.
+      </p>
 
       <div className="flex gap-3 border-t border-sand-200 pt-6">
         <button
