@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
-import { Container, Icon } from "@/components/ui";
+import { Container, Icon, ScrollToTop } from "@/components/ui";
 import { getListingFull } from "@/lib/supabase/queries/listings";
 import PhotoGallery from "./_components/PhotoGallery";
 import BookingCard from "./_components/BookingCard";
@@ -62,6 +62,7 @@ export default async function ChaletDetailPage(
 
   return (
     <>
+      <ScrollToTop />
       <Header />
       <main className="flex-1 pb-24 md:pb-0">
         {/* ── Photo Gallery ─────────────────────────────── */}
