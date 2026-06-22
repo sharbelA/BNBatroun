@@ -16,7 +16,8 @@ export const supabase = new Proxy({} as ReturnType<typeof createBrowserClient>, 
     if (!_client) {
       _client = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { auth: { flowType: 'pkce' } }
       );
     }
     return (_client as Record<string, unknown>)[prop as string];

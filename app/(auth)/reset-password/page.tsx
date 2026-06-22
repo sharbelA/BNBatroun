@@ -20,81 +20,83 @@ export default function ResetPasswordPage() {
   const [confirm, setConfirm] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const resolvedRef = useRef(false) // prevent multiple phase transitions
+  // Guard so the first resolution wins and subsequent async callbacks are ignored.
+  const resolved = useRef(false)
 
   function resolve(next: Phase) {
-    if (!resolvedRef.current) {
-      resolvedRef.current = true
+    if (!resolved.current) {
+      resolved.current = true
       setPhase(next)
     }
   }
 
   useEffect(() => {
-    // Supabase appends auth data to the URL. It uses the HASH fragment (#), not
-    // the query string, for both success tokens and error codes. Parse both.
     const search = new URLSearchParams(window.location.search)
-    const hash = new URLSearchParams(window.location.hash.slice(1))
+    const hash   = new URLSearchParams(window.location.hash.slice(1))
 
-    // ── Error case ────────────────────────────────────────────
-    // Supabase sends expired/invalid links as:
-    //   #error=access_denied&error_code=otp_expired&error_description=...
-    // or occasionally as query params.
-    const hasError =
-      hash.get('error') || search.get('error') ||
-      hash.get('error_code') || search.get('error_code')
-
-    if (hasError) {
+    // ── Explicit Supabase error in URL ────────────────────────
+    // Expired / invalid links land with ?error=access_denied or
+    // #error=access_denied in the URL.  Show "expired" immediately.
+    if (search.get('error') || hash.get('error')) {
       resolve('expired')
       return
     }
 
-    // ── Success case ──────────────────────────────────────────
-    // Supabase sends valid recovery links with ONE of these patterns:
-    //   #access_token=...&type=recovery   (implicit / non-PKCE)
-    //   ?type=recovery&token_hash=...     (PKCE flow used by @supabase/ssr)
-    const hasRecoverySignal =
-      hash.get('access_token') ||
-      hash.get('type') === 'recovery' ||
-      search.get('type') === 'recovery' ||
-      search.get('token_hash')
-
-    if (!hasRecoverySignal) {
-      // No recovery signal at all — direct navigation or unknown URL shape.
-      resolve('expired')
+    // ── PKCE flow (primary) ───────────────────────────────────
+    // @supabase/ssr uses PKCE by default.  The Supabase verify endpoint
+    // processes the one-time token and redirects here with ?code=<PKCE_CODE>.
+    // We must exchange that code for a session; without this step the page
+    // will always time-out and show "expired."
+    const code = search.get('code')
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(
+        (result: { data: { session: Session | null }; error: AuthError | null }) => {
+          if (result.error || !result.data.session) {
+            resolve('expired')
+          } else {
+            resolve('form')
+          }
+        }
+      )
+      // No need for a timeout here — exchangeCodeForSession resolves quickly.
       return
     }
 
-    // Subscribe BEFORE calling getSession so we don't miss the event.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event: AuthChangeEvent) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          resolve('form')
+    // ── Implicit flow (fallback) ──────────────────────────────
+    // Older Supabase projects or manually-configured templates may redirect
+    // with #access_token=...&type=recovery instead of ?code=....
+    const hasImplicitRecovery =
+      (hash.get('access_token') && hash.get('type') === 'recovery') ||
+      (search.get('type') === 'recovery' && search.get('token_hash'))
+
+    if (hasImplicitRecovery) {
+      // Subscribe first so we never miss the event.
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (event: AuthChangeEvent) => {
+          if (event === 'PASSWORD_RECOVERY') resolve('form')
         }
-      }
-    )
+      )
 
-    // Fallback: the browser client may have already processed the URL params
-    // before this effect ran (the client is a singleton). getSession() returns
-    // the already-established recovery session in that case.
-    supabase.auth.getSession().then(
-      (result: { data: { session: Session | null }; error: AuthError | null }) => {
-        if (result.data.session) {
-          resolve('form')
+      // The client may have already processed the URL; check for a session.
+      supabase.auth.getSession().then(
+        (result: { data: { session: Session | null }; error: AuthError | null }) => {
+          if (result.data.session) resolve('form')
         }
+      )
+
+      const timer = setTimeout(() => resolve('expired'), 4000)
+      return () => {
+        subscription.unsubscribe()
+        clearTimeout(timer)
       }
-    )
-
-    // Final timeout: if neither the event nor getSession yields a session
-    // within 4 s, treat the token as expired.
-    const timer = setTimeout(() => resolve('expired'), 4000)
-
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(timer)
     }
+
+    // ── No recognisable params ────────────────────────────────
+    // Direct navigation to /reset-password with no auth context.
+    resolve('expired')
   }, [])
 
-  // Auto-redirect to host login 3 s after password is updated
+  // Auto-redirect to host login 3 s after a successful password update.
   useEffect(() => {
     if (phase !== 'done') return
     const t = setTimeout(() => router.push('/host/login'), 3000)
@@ -104,7 +106,7 @@ export default function ResetPasswordPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (password !== confirm) { setFormError('Passwords do not match.'); return }
-    if (password.length < 6) { setFormError('Password must be at least 6 characters.'); return }
+    if (password.length < 6)  { setFormError('Password must be at least 6 characters.'); return }
     setFormError(null)
     setSubmitting(true)
 
@@ -122,8 +124,9 @@ export default function ResetPasswordPage() {
   // ── Loading ───────────────────────────────────────────────
   if (phase === 'loading') {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-sand-50">
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-sand-50 px-4">
         <div className="h-7 w-7 animate-spin rounded-full border-2 border-sand-200 border-t-[var(--accent)]" />
+        <p className="text-sm text-warm-500">Verifying your reset link…</p>
       </main>
     )
   }
@@ -141,12 +144,10 @@ export default function ResetPasswordPage() {
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
-            <h1 className="mb-2 text-xl font-semibold text-warm-900">
-              Reset link expired
-            </h1>
+            <h1 className="mb-2 text-xl font-semibold text-warm-900">Reset link expired</h1>
             <p className="text-sm text-warm-500 leading-relaxed">
-              This password reset link is invalid or has expired. Links are
-              valid for 1 hour. Please request a new one.
+              This password reset link is invalid or has expired.
+              Links are valid for 1 hour.
             </p>
             <Link
               href="/forgot-password"
@@ -177,7 +178,7 @@ export default function ResetPasswordPage() {
             </p>
             <Link
               href="/host/login"
-              className="mt-6 inline-block text-sm font-medium text-[var(--accent)] hover:underline"
+              className="mt-5 inline-block text-sm font-medium text-[var(--accent)] hover:underline"
             >
               Go to sign in
             </Link>
