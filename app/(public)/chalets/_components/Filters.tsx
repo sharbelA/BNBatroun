@@ -251,7 +251,6 @@ export default function Filters({
       <div className="hidden rounded-2xl border border-[var(--border-light)] bg-white p-6 md:block">
         {panel}
       </div>
-
       {/* Mobile bottom sheet */}
       {sheetOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
@@ -260,21 +259,32 @@ export default function Filters({
             onClick={() => setSheetOpen(false)}
             className="absolute inset-0 bg-black/30"
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white p-5 pb-8 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-warm-900">Filters</h2>
+
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-2xl bg-white shadow-xl">
+
+            <div className="border-b border-[var(--border-light)] p-5">
+              <h2 className="text-base font-semibold text-warm-900">
+                Filters
+              </h2>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5">
+              {panel}
+            </div>
+
+            <div className="border-t border-[var(--border-light)] p-4">
               <button
                 type="button"
                 onClick={() => setSheetOpen(false)}
-                className="text-sm font-medium text-warm-500 hover:text-warm-900"
+                className="w-full rounded-xl bg-[var(--accent)] py-3 text-sm font-medium text-white"
               >
                 Done
               </button>
             </div>
-            {panel}
+
           </div>
         </div>
       )}
-    </div>
+    </div>   
   );
 }

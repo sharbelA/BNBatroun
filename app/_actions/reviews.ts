@@ -80,3 +80,39 @@ export async function moderateReviewAction(
   revalidatePath(`/chalets/${review.listings.slug}`)
   return { error: null, success: true }
 }
+
+export async function deleteReviewAction(
+  reviewId: string,
+): Promise<ActionState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: profile } = (await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()) as { data: { role: string } | null }
+
+  if (!profile || profile.role !== 'admin') return { error: 'Admin access required' }
+
+  // Fetch listing slug for revalidation before deleting
+  const { data: review } = (await supabase
+    .from('reviews')
+    .select('listing_id, listings(slug)')
+    .eq('id', reviewId)
+    .single()) as { data: { listing_id: string; listings: { slug: string } } | null }
+
+  if (!review) return { error: 'Review not found' }
+
+  const { error } = await supabase
+    .from('reviews')
+    .delete()
+    .eq('id', reviewId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin/reviews')
+  revalidatePath(`/chalets/${review.listings.slug}`)
+  return { error: null, success: true }
+}
