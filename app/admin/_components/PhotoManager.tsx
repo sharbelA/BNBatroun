@@ -27,6 +27,16 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Touch drag state
+  const touchRef = useRef<{
+    startIndex: number;
+    currentIndex: number;
+    startY: number;
+    startX: number;
+  } | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  /* ─── File upload ─── */
   const handleFiles = useCallback(async (files: FileList | File[]) => {
     setError(null);
     const fileArray = Array.from(files);
@@ -70,6 +80,7 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
     window.location.reload();
   }, [listingId, supabaseUrl]);
 
+  /* ─── Delete ─── */
   const handleDelete = useCallback(async (image: ListingImage) => {
     if (!confirm("Delete this photo?")) return;
     const storagePath = image.url.includes("/listing-photos/")
@@ -80,6 +91,7 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
     setImages((prev) => prev.filter((img) => img.id !== image.id));
   }, [listingId]);
 
+  /* ─── Desktop drag ─── */
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     if (dragIndex === null || dragIndex === index) return;
@@ -97,6 +109,68 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
     await reorderPhotosAction(listingId, images.map((img) => img.id));
   };
 
+  /* ─── Mobile touch drag ─── */
+  const handleTouchStart = (index: number, e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchRef.current = {
+      startIndex: index,
+      currentIndex: index,
+      startY: touch.clientY,
+      startX: touch.clientX,
+    };
+    setDragIndex(index);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchRef.current || !gridRef.current) return;
+    const touch = e.touches[0];
+    const elements = gridRef.current.children;
+
+    for (let i = 0; i < elements.length; i++) {
+      const rect = elements[i].getBoundingClientRect();
+      if (
+        touch.clientX >= rect.left &&
+        touch.clientX <= rect.right &&
+        touch.clientY >= rect.top &&
+        touch.clientY <= rect.bottom
+      ) {
+        if (i !== touchRef.current.currentIndex) {
+          const fromIndex = touchRef.current.currentIndex;
+          setImages((prev) => {
+            const updated = [...prev];
+            const [moved] = updated.splice(fromIndex, 1);
+            updated.splice(i, 0, moved);
+            return updated;
+          });
+          touchRef.current.currentIndex = i;
+          setDragIndex(i);
+        }
+        break;
+      }
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    touchRef.current = null;
+    setDragIndex(null);
+    await reorderPhotosAction(listingId, images.map((img) => img.id));
+  };
+
+  /* ─── Move buttons (mobile fallback) ─── */
+  const moveImage = async (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= images.length) return;
+    setImages((prev) => {
+      const updated = [...prev];
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      return updated;
+    });
+    const reordered = [...images];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+    await reorderPhotosAction(listingId, reordered.map((img) => img.id));
+  };
+
   return (
     <div>
       {error && (
@@ -106,6 +180,7 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
         </div>
       )}
 
+      {/* Upload zone */}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
@@ -141,6 +216,7 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
         )}
       </div>
 
+      {/* Photo grid */}
       {images.length === 0 ? (
         <div className="py-12 text-center text-sm text-[var(--muted)]">
           No photos yet. Upload the first one above.
@@ -148,9 +224,14 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
       ) : (
         <>
           <p className="mb-3 text-xs text-[var(--muted)]">
-            Drag photos to reorder. First photo is the cover image.
+            Drag photos to reorder, or use the arrow buttons. First photo is the cover image.
           </p>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div
+            ref={gridRef}
+            className="grid grid-cols-2 gap-4 sm:grid-cols-3"
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {images.map((image, index) => (
               <div
                 key={image.id}
@@ -158,6 +239,7 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
                 onDragStart={() => setDragIndex(index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
+                onTouchStart={(e) => handleTouchStart(index, e)}
                 className={`group relative aspect-[4/3] overflow-hidden rounded-xl bg-[var(--surface)] cursor-grab active:cursor-grabbing ${
                   dragIndex === index ? "opacity-50 ring-2 ring-[var(--accent)]" : ""
                 }`}
@@ -169,22 +251,51 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
                   className="object-cover"
                   sizes="(max-width: 640px) 50vw, 33vw"
                 />
-                <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-black/50 via-transparent p-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                  <span className="text-xs font-semibold text-white bg-black/40 px-2 py-0.5 rounded">
-                    {index === 0 ? "Cover" : `#${index + 1}`}
-                  </span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(image); }}
-                    className="text-xs font-medium text-red-300 hover:text-white bg-black/40 px-2 py-0.5 rounded transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
-                {index === 0 && (
-                  <div className="absolute top-2 left-2 bg-white text-xs font-semibold px-2 py-0.5 rounded shadow">
-                    Cover
+
+                {/* Overlay with controls */}
+                <div className="absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/50 via-transparent p-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  {/* Top: reorder arrows */}
+                  <div className="flex justify-between">
+                    <div className="flex gap-1">
+                      {index > 0 && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); moveImage(index, index - 1); }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white text-xs hover:bg-black/70 transition"
+                          title="Move left"
+                        >
+                          ←
+                        </button>
+                      )}
+                      {index < images.length - 1 && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); moveImage(index, index + 1); }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white text-xs hover:bg-black/70 transition"
+                          title="Move right"
+                        >
+                          →
+                        </button>
+                      )}
+                    </div>
+                    {index === 0 && (
+                      <span className="bg-white text-xs font-semibold px-2 py-0.5 rounded shadow">
+                        Cover
+                      </span>
+                    )}
                   </div>
-                )}
+
+                  {/* Bottom: label + delete */}
+                  <div className="flex items-end justify-between">
+                    <span className="text-xs font-semibold text-white bg-black/40 px-2 py-0.5 rounded">
+                      {index === 0 ? "Cover" : `#${index + 1}`}
+                    </span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(image); }}
+                      className="text-xs font-medium text-red-300 hover:text-white bg-black/40 px-2 py-0.5 rounded transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
