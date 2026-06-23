@@ -16,6 +16,7 @@ export type RegionSlug = (typeof REGIONS)[number]["slug"];
 export const BATROUN_AREAS = [
   { name: "Batroun City", slug: "batroun-city", emoji: "🏛️" },
   { name: "Kfar Abida", slug: "kfar-abida", emoji: "🌊" },
+  { name: "Halta", slug: "halta", emoji: "🌴" },
   { name: "Hamat", slug: "hamat", emoji: "⛰️" },
   { name: "Msaylha", slug: "msaylha", emoji: "🏰" },
   { name: "Thoum", slug: "thoum", emoji: "🌿" },
