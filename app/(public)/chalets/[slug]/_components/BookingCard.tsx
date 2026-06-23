@@ -15,6 +15,7 @@ import {
   getDay,
 } from "date-fns";
 import { Icon } from "@/components/ui";
+import { useBooking } from "./BookingContext";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bnbatroun.com";
 const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
@@ -79,11 +80,36 @@ export default function BookingCard({
     return set;
   }, [availability]);
 
-  const [checkIn, setCheckIn] = useState<Date | undefined>();
-  const [checkOut, setCheckOut] = useState<Date | undefined>();
+  const [checkIn, setCheckInLocal] = useState<Date | undefined>();
+  const [checkOut, setCheckOutLocal] = useState<Date | undefined>();
   const [guests, setGuests] = useState(Math.min(2, maxGuests));
   const [openField, setOpenField] = useState<PickerField>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Sync with shared booking context (from the main calendar)
+  let booking: ReturnType<typeof useBooking> | null = null;
+  try { booking = useBooking(); } catch { /* not in provider — standalone mode */ }
+
+  // If context has dates, use them instead of local state
+  const effectiveCheckIn = booking?.checkIn ?? checkIn;
+  const effectiveCheckOut = booking?.checkOut ?? checkOut;
+
+  const setCheckIn = (d: Date | undefined) => {
+    setCheckInLocal(d);
+    if (booking) { booking.setCheckIn(d); booking.setStep(d ? "checkout" : "checkin"); }
+  };
+  const setCheckOut = (d: Date | undefined) => {
+    setCheckOutLocal(d);
+    if (booking) { booking.setCheckOut(d); if (d) booking.setStep("done"); }
+  };
+
+  // Keep local state synced when context changes
+  useEffect(() => {
+    if (booking?.checkIn !== undefined) setCheckInLocal(booking.checkIn);
+  }, [booking?.checkIn]);
+  useEffect(() => {
+    if (booking?.checkOut !== undefined) setCheckOutLocal(booking.checkOut);
+  }, [booking?.checkOut]);
 
   // Close calendar on outside click
   useEffect(() => {

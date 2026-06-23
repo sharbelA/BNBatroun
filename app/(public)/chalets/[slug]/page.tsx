@@ -5,6 +5,8 @@ import { Container, Icon, ScrollToTop } from "@/components/ui";
 import { getListingFull } from "@/lib/supabase/queries/listings";
 import PhotoGallery from "./_components/PhotoGallery";
 import BookingCard from "./_components/BookingCard";
+import { BookingProvider } from "./_components/BookingContext";
+import GuestBookingCalendar from "./_components/GuestBookingCalendar";
 import AvailabilityCalendar from "@/components/calendar/AvailabilityCalendar";
 import ExpandableTextClient from "./_components/ExpandableText";
 import MobileBookingBar from "./_components/MobileBookingBar";
@@ -61,7 +63,7 @@ export default async function ChaletDetailPage(
     .map((key) => ({ key, label: AMENITY_MAP[key].label }));
 
   return (
-    <>
+    <BookingProvider>
       <ScrollToTop />
       <Header />
       <main className="flex-1 pb-24 md:pb-0">
@@ -199,20 +201,14 @@ export default async function ChaletDetailPage(
                 </>
               )}
 
-              {/* ── Availability Calendar ── */}
+              {/* ── Availability & Booking Calendar ── */}
               <Divider />
               <section>
-                <h2 className="text-xl md:text-2xl mb-1">Availability</h2>
+                <h2 className="text-xl md:text-2xl mb-1">Select your dates</h2>
                 <p className="text-sm text-[var(--muted)] mb-5">
-                  {availability.length > 0
-                    ? "Select your dates to see pricing."
-                    : "Contact us to confirm your preferred dates."}
+                  Tap your check-in and check-out dates to see pricing.
                 </p>
-                <AvailabilityCalendar
-                  listingId={listing.id}
-                  initialAvailability={availability}
-                  mode="readonly"
-                />
+                <GuestBookingCalendar availability={availability} />
               </section>
 
               {/* ── Reviews ── */}
@@ -279,7 +275,7 @@ export default async function ChaletDetailPage(
         />
       </main>
       <Footer />
-    </>
+    </BookingProvider>
   );
 }
 
