@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import { Icon } from "@/components/ui";
 import type { ListingImage } from "@/lib/supabase/types";
 
@@ -59,13 +58,10 @@ export default function PhotoGallery({ images, title }: PhotoGalleryProps) {
         <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-2 rounded-2xl overflow-hidden max-h-[520px]">
           {/* Main image */}
           <div className="relative aspect-[16/9]">
-            <Image
+            <img
               src={main.url}
               alt={main.alt_text ?? title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 66vw"
-              priority
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
 
@@ -73,24 +69,20 @@ export default function PhotoGallery({ images, title }: PhotoGalleryProps) {
           {(side1 || side2) && (
             <div className="hidden md:grid grid-rows-2 gap-2">
               {side1 && (
-                <div className="relative">
-                  <Image
+                <div className="relative overflow-hidden">
+                  <img
                     src={side1.url}
                     alt={side1.alt_text ?? title}
-                    fill
-                    className="object-cover"
-                    sizes="33vw"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
               )}
               {side2 && (
-                <div className="relative">
-                  <Image
+                <div className="relative overflow-hidden">
+                  <img
                     src={side2.url}
                     alt={side2.alt_text ?? title}
-                    fill
-                    className="object-cover"
-                    sizes="33vw"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
               )}
@@ -146,11 +138,9 @@ export default function PhotoGallery({ images, title }: PhotoGalleryProps) {
             className="relative w-full max-w-4xl max-h-[80vh] mx-12 sm:mx-16"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
+            <img
               src={images[activeIndex].url}
               alt={images[activeIndex].alt_text ?? title}
-              width={1200}
-              height={800}
               className="object-contain w-full h-full max-h-[80vh]"
             />
           </div>
@@ -178,12 +168,10 @@ export default function PhotoGallery({ images, title }: PhotoGalleryProps) {
                     : "border-transparent opacity-50 hover:opacity-80"
                 }`}
               >
-                <Image
+                <img
                   src={img.url}
                   alt={img.alt_text ?? `Photo ${i + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="64px"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </button>
             ))}

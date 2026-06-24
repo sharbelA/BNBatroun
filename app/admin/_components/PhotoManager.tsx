@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import Image from "next/image";
 import { supabase } from "@/lib/supabase/client";
 import {
   addPhotoAction,
@@ -244,12 +243,10 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
                   dragIndex === index ? "opacity-50 ring-2 ring-[var(--accent)]" : ""
                 }`}
               >
-                <Image
+                <img
                   src={image.url}
                   alt={image.alt_text || `Photo ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 50vw, 33vw"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
 
                 {/* Overlay with controls */}

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/app/_actions/auth";
 import { getHostListings } from "@/lib/supabase/queries/listings";
@@ -44,12 +43,10 @@ export default async function HostDashboardPage() {
               {/* Cover image */}
               <div className="relative aspect-[4/3] w-full bg-[var(--surface)]">
                 {listing.cover_image ? (
-                  <Image
+                  <img
                     src={listing.cover_image}
                     alt={listing.title}
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-[var(--border)]">

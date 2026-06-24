@@ -13,7 +13,6 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import Image from "next/image";
 import Icon from "./Icon";
 
 interface ImageCarouselProps {
@@ -108,12 +107,10 @@ export default function ImageCarousel({
         className={`relative ${aspectRatio} overflow-hidden rounded-xl bg-[var(--surface)]`}
       >
         {images[0] && !failedImages.has(0) ? (
-          <Image
+          <img
             src={images[0]}
             alt={alt}
-            fill
-            sizes={sizes}
-            className="object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             onError={() => handleImageError(0)}
           />
         ) : (
@@ -140,12 +137,10 @@ export default function ImageCarousel({
         {images.map((src, i) => (
           <div key={i} className="relative w-full h-full shrink-0">
             {!failedImages.has(i) ? (
-              <Image
+              <img
                 src={src}
                 alt={`${alt} — photo ${i + 1}`}
-                fill
-                sizes={sizes}
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
                 onError={() => handleImageError(i)}
                 loading={i === 0 ? "eager" : "lazy"}
               />
