@@ -16,7 +16,6 @@ export type RegionSlug = (typeof REGIONS)[number]["slug"];
 export const BATROUN_AREAS = [
   { name: "Batroun City", slug: "batroun-city", emoji: "🏛️" },
   { name: "Kfar Abida", slug: "kfar-abida", emoji: "🌊" },
-  { name: "Halta", slug: "halta", emoji: "🌴" },
   { name: "Hamat", slug: "hamat", emoji: "⛰️" },
   { name: "Msaylha", slug: "msaylha", emoji: "🏰" },
   { name: "Thoum", slug: "thoum", emoji: "🌿" },
@@ -24,11 +23,8 @@ export const BATROUN_AREAS = [
   { name: "Rachana", slug: "rachana", emoji: "🎨" },
   { name: "Hardine", slug: "hardine", emoji: "🌲" },
   { name: "Douma", slug: "douma", emoji: "🏔️" },
-  { name: "Deria", slug: "deria", emoji: "🌾" },
-  { name: "Edde", slug: "edde", emoji: "🏖️" },
   { name: "Smar Jbeil", slug: "smar-jbeil", emoji: "🌳" },
   { name: "Tannourine", slug: "tannourine", emoji: "❄️" },
-  { name: "Tannourine Al Tahta", slug: "tannourine-al-tahta", emoji: "🌨️" },
   { name: "Other", slug: "other", emoji: "📍" },
 ] as const;
 

@@ -54,9 +54,10 @@ export default function Filters({
   const maxPrice = searchParams.get("maxPrice") ?? "";
   const bedrooms = searchParams.get("bedrooms") ?? "";
   const maxGuests = searchParams.get("maxGuests") ?? "";
+  const search = searchParams.get("search") ?? "";
 
   const hasActiveFilters =
-    amenities.length > 0 || area || minPrice || maxPrice || bedrooms || maxGuests;
+    amenities.length > 0 || area || minPrice || maxPrice || bedrooms || maxGuests || search;
 
   function update(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -238,7 +239,7 @@ export default function Filters({
           Filters
           {hasActiveFilters && (
             <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent)] text-[11px] font-semibold text-white">
-              {amenities.length + [area, minPrice, maxPrice, bedrooms, maxGuests].filter(Boolean).length}
+              {amenities.length + [area, minPrice, maxPrice, bedrooms, maxGuests, search].filter(Boolean).length}
             </span>
           )}
         </button>

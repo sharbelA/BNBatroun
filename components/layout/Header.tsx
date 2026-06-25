@@ -8,6 +8,7 @@ import { Icon, Container } from "@/components/ui";
 import { getCurrentUser } from "@/app/_actions/auth";
 import { SITE } from "@/lib/constants";
 import UserMenu from "./UserMenu";
+import { Suspense } from "react";
 import SearchBarDesktop from "./SearchBarDesktop";
 import SearchBarMobile from "./SearchBarMobile";
 
@@ -31,7 +32,9 @@ export default async function Header() {
             </span>
           </Link>
 
-          <SearchBarDesktop />
+          <Suspense>
+            <SearchBarDesktop />
+          </Suspense>
 
           <div className="flex items-center gap-1 shrink-0">
             <Link
@@ -55,7 +58,9 @@ export default async function Header() {
           </div>
         </div>
 
-        <SearchBarMobile />
+        <Suspense>
+          <SearchBarMobile />
+        </Suspense>
       </Container>
     </header>
   );
