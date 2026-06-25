@@ -1,38 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui";
 
 export default function SearchBarDesktop() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentSearch = searchParams.get("search") ?? "";
-  const [query, setQuery] = useState(currentSearch);
-
-  const hasFilters =
-    searchParams.has("search") ||
-    searchParams.has("amenities") ||
-    searchParams.has("area") ||
-    searchParams.has("minPrice") ||
-    searchParams.has("maxPrice") ||
-    searchParams.has("bedrooms") ||
-    searchParams.has("maxGuests");
+  const [query, setQuery] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const params = new URLSearchParams(searchParams.toString());
     if (query.trim()) {
-      params.set("search", query.trim());
+      router.push(`/chalets?search=${encodeURIComponent(query.trim())}`);
     } else {
-      params.delete("search");
+      router.push("/chalets");
     }
-    router.push(`/chalets?${params.toString()}`);
-  }
-
-  function handleClear() {
-    setQuery("");
-    router.push("/chalets");
   }
 
   return (
@@ -48,17 +30,8 @@ export default function SearchBarDesktop() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search chalets..."
-        className="px-4 py-2 text-sm bg-transparent outline-none w-40 placeholder:text-[var(--muted)]"
+        className="px-4 py-2 text-sm bg-transparent outline-none w-44 placeholder:text-[var(--muted)]"
       />
-      {hasFilters && (
-        <button
-          type="button"
-          onClick={handleClear}
-          className="px-3 text-xs font-medium text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
-        >
-          Clear
-        </button>
-      )}
       <button
         type="submit"
         className="m-1.5 w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center hover:opacity-90 transition-opacity"
