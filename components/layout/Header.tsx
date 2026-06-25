@@ -8,8 +8,8 @@ import { Icon, Container } from "@/components/ui";
 import { getCurrentUser } from "@/app/_actions/auth";
 import { SITE } from "@/lib/constants";
 import UserMenu from "./UserMenu";
-import SearchBarDesktop from "./SearchBarDesktop";
-import SearchBarMobile from "./SearchBarMobile";
+import SearchBarDesktop, { FilterButton } from "./SearchBarDesktop";
+import SearchBarMobile, { MobileFilterButton } from "./SearchBarMobile";
 
 export default async function Header() {
   const user = await getCurrentUser();
@@ -32,6 +32,7 @@ export default async function Header() {
           </Link>
 
           <SearchBarDesktop />
+          <FilterButton />
 
           <div className="flex items-center gap-1 shrink-0">
             <Link
@@ -55,7 +56,10 @@ export default async function Header() {
           </div>
         </div>
 
-        <SearchBarMobile />
+        <div className="md:hidden flex gap-2">
+          <div className="flex-1"><SearchBarMobile /></div>
+          <MobileFilterButton />
+        </div>
       </Container>
     </header>
   );
