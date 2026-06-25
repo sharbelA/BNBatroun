@@ -20,7 +20,7 @@ export default function SearchBarMobile() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="md:hidden w-full flex items-center gap-2 border border-[var(--border)] rounded-full px-4 py-2.5 bg-white mb-4 transition-shadow duration-200 focus-within:shadow-[var(--card-shadow)] focus-within:border-[var(--accent)]/30"
+      className="md:hidden flex-1 flex items-center gap-2 border border-[var(--border)] rounded-full px-4 py-2.5 bg-white transition-shadow duration-200 focus-within:shadow-[var(--card-shadow)] focus-within:border-[var(--accent)]/30"
     >
       <Icon name="search" size={18} strokeWidth={2.5} />
       <input
@@ -46,14 +46,14 @@ function MobileFilterButton() {
     <button
       type="button"
       onClick={() => router.push("/chalets?filters=open")}
-      className="md:hidden flex items-center gap-2 border border-[var(--border)] rounded-full px-4 py-2.5 bg-white mb-4 text-sm font-medium hover:border-[var(--accent)]/30 transition-all"
+      className="md:hidden flex items-center justify-center w-10 h-10 shrink-0 border border-[var(--border)] rounded-full bg-white hover:border-[var(--accent)]/30 transition-all"
+      aria-label="Filters"
     >
-      <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <line x1="4" y1="6" x2="20" y2="6" />
         <line x1="8" y1="12" x2="16" y2="12" />
         <line x1="11" y1="18" x2="13" y2="18" />
       </svg>
-      Filters
     </button>
   );
 }

@@ -56,8 +56,9 @@ export default async function Header() {
           </div>
         </div>
 
-        <div className="md:hidden flex gap-2">
-          <div className="flex-1"><SearchBarMobile /></div>
+        {/* Mobile: search bar full width with filter icon */}
+        <div className="md:hidden flex items-center gap-2 mb-4">
+          <SearchBarMobile />
           <MobileFilterButton />
         </div>
       </Container>
