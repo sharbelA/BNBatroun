@@ -64,8 +64,13 @@ export default async function AdminListingsPage() {
                   key={listing.id}
                   className="hover:bg-sand-50 transition-colors"
                 >
-                  <td className="px-4 py-3 font-medium text-warm-900">
-                    {listing.title}
+                  <td className="px-4 py-3">
+                    <span className="font-medium text-warm-900">{listing.title}</span>
+                    {listing.internal_name && (
+                      <span className="block text-xs text-warm-400 mt-0.5">
+                        🔒 {listing.internal_name}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-warm-600">
                     {listing.host_name}

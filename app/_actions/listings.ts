@@ -46,6 +46,7 @@ function parseFormData(formData: FormData) {
   return {
     title,
     slug,
+    internal_name: (formData.get("internal_name") as string)?.trim() || null,
     description: formData.get("description") as string,
     location: (formData.get("location") as string) || "Batroun",
     price: Math.round(parseInt(formData.get("price") as string, 10)),
