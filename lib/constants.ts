@@ -29,6 +29,7 @@ export const BATROUN_AREAS = [
   { name: "Deria", slug: "deria", emoji: "🌅" },
   { name: "Halta", slug: "halta", emoji: "🌿" },
   { name: "Koubba", slug: "koubba", emoji: "🏘️" },
+  { name: "Ijdabra", slug: "ijdabra", emoji: "🌱" },
 
   { name: "Other", slug: "other", emoji: "📍" },
 ] as const;
