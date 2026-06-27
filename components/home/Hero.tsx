@@ -1,10 +1,4 @@
-/**
- * Hero — homepage hero with headline and region filters.
- * Composes Container + RegionPills.
- */
-
 import { Container } from "@/components/ui";
-import RegionPills from "./RegionPills";
 
 export default function Hero() {
   return (
@@ -32,10 +26,6 @@ export default function Hero() {
             Discover handpicked chalets and villas on the Batroun coast.
             Your perfect getaway is one click away.
           </p>
-        </div>
-
-        <div className="mt-12">
-          <RegionPills />
         </div>
       </Container>
     </section>
