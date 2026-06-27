@@ -26,7 +26,7 @@ export default function AboutPage() {
               About BNBatroun
             </h1>
             <p className="mx-auto max-w-xl text-lg leading-relaxed text-warm-500">
-              A curated collection of chalets in Batroun, Lebanon — where the
+              A curated collection of chalets in Batroun, Lebanon, where the
               mountains meet the Mediterranean.
             </p>
           </Container>
@@ -38,13 +38,13 @@ export default function AboutPage() {
             <div className="mx-auto max-w-2xl">
               <h2 className="text-2xl md:text-3xl text-warm-900 mb-6 section-title">Our story</h2>
               <p className="leading-relaxed text-warm-600 mb-4">
-                BNBatroun — your bed-and-breakfast network in Batroun — was built
+                BNBatroun, your bed-and-breakfast network in Batroun, was built
                 to connect travelers with the best chalets in North Lebanon.
                 Every property is hand-selected and verified to ensure an
                 authentic, comfortable stay.
               </p>
               <p className="leading-relaxed text-warm-600">
-                Booking is simple and personal — all inquiries go directly to the
+                Booking is simple and personal. All inquiries go directly to the
                 host via WhatsApp, keeping things human and fast.
               </p>
             </div>
@@ -66,7 +66,7 @@ export default function AboutPage() {
               </p>
               <p className="leading-relaxed text-warm-300">
                 Whether you want a sea-view villa, a stone chalet in the pine
-                forests, or a poolside retreat, Batroun has it all — and BNBatroun
+                forests, or a poolside retreat, Batroun has it all, and BNBatroun
                 helps you find it.
               </p>
             </div>
@@ -81,8 +81,8 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 {[
                   { icon: '✋', title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
-                  { icon: '💬', title: 'WhatsApp-first', desc: 'Book directly with hosts — no middlemen, no hidden fees.' },
-                  { icon: '📍', title: 'Batroun experts', desc: 'Local knowledge baked in — we know every beach, trail, and restaurant.' },
+                  { icon: '💬', title: 'WhatsApp-first', desc: 'Book directly with hosts. No middlemen, no hidden fees.' },
+                  { icon: '📍', title: 'Batroun experts', desc: 'Local knowledge baked in. We know every beach, trail, and restaurant.' },
                 ].map(({ icon, title, desc }) => (
                   <div key={title} className="text-center">
                     <div className="text-3xl mb-4">{icon}</div>

@@ -13,14 +13,14 @@ export const metadata: Metadata = {
 };
 
 const BENEFITS = [
-  { title: "Direct WhatsApp bookings", body: "Guests contact you directly — no middlemen, no platform fees on each booking." },
+  { title: "Direct WhatsApp bookings", body: "Guests contact you directly. No middlemen, no platform fees on each booking." },
   { title: "Full control", body: "Set your own prices, block dates when you need to, and manage your availability calendar." },
   { title: "Beautiful listing page", body: "Professional photos, detailed amenities, and an instant-view availability calendar." },
   { title: "Local focus", body: "BNBatroun is built for Batroun. Every guest who visits is looking for exactly what you offer." },
 ];
 
 const STEPS = [
-  { n: "01", title: "Message us on WhatsApp", body: "Tell us about your property — location, size, what makes it special." },
+  { n: "01", title: "Message us on WhatsApp", body: "Tell us about your property: location, size, what makes it special." },
   { n: "02", title: "Send us your photos and details", body: "Share photos, pricing, house rules, and amenities. We handle the rest." },
   { n: "03", title: "We create your listing and host account", body: "Your chalet goes live. We give you a login to manage your availability calendar." },
 ];
@@ -42,7 +42,7 @@ export default function ListYourChaletPage() {
               List your chalet on BNBatroun
             </h1>
             <p className="mx-auto mb-9 max-w-xl text-lg text-white/85 leading-relaxed">
-              Reach guests looking for exactly what Batroun offers — and keep full control of your bookings.
+              Reach guests looking for exactly what Batroun offers, and keep full control of your bookings.
             </p>
             <a
               href={WA_LINK}
