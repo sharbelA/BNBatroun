@@ -1,4 +1,10 @@
+/**
+ * Hero — homepage hero with headline and region filters.
+ * Composes Container + RegionPills.
+ */
+
 import { Container } from "@/components/ui";
+import RegionPills from "./RegionPills";
 
 export default function Hero() {
   return (
@@ -17,15 +23,19 @@ export default function Hero() {
             Batroun, Lebanon
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl tracking-tight leading-[1.05]">
-            Your Home Away
+            Your home away
             <br />
-            From Home In{" "}
+            from home in{" "}
             <span className="text-[var(--accent)]">Lebanon</span>
           </h1>
           <p className="mt-6 text-lg text-warm-500 max-w-md leading-relaxed">
-            Discover handpicked chalets and villas on the Batroun coast.
-            Your perfect getaway is one click away.
+            Discover handpicked chalets and villas on the Batroun coast —
+            your perfect getaway is one click away.
           </p>
+        </div>
+
+        <div className="mt-12">
+          <RegionPills />
         </div>
       </Container>
     </section>

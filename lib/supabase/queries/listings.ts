@@ -45,7 +45,7 @@ export async function getListings(options: { featured?: boolean; limit?: number 
     .neq("slug", "");
   if (options.featured) query = query.eq("is_featured", true);
   if (options.limit) query = query.limit(options.limit);
-  query = query.order("created_at", { ascending: false });
+  query = query.order("display_order", { ascending: true }).order("created_at", { ascending: false });
 
   const { data, error } = await query;
   if (error) { console.error("[getListings]", error.message); return []; }
@@ -105,7 +105,7 @@ export async function getFilteredListings(
   if (filters.area) query = query.eq("location", filters.area);
   if (filters.search) query = query.ilike("title", `%${filters.search}%`);
 
-  query = query.order("created_at", { ascending: false });
+  query = query.order("display_order", { ascending: true }).order("created_at", { ascending: false });
 
   const { data, error } = await query;
   if (error) { console.error("[getFilteredListings]", error.message); return []; }

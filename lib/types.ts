@@ -27,6 +27,7 @@ export interface Listing {
   house_rules: string[];
   is_featured: boolean;
   is_active: boolean;
+  display_order: number;
   created_at: string;
   updated_at: string;
   images: string[];

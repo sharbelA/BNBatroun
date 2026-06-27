@@ -9,6 +9,7 @@ import { Icon } from '@/components/ui'
 const NAV = [
   { href: '/admin/dashboard', label: 'Overview' },
   { href: '/admin/listings', label: 'Chalets' },
+  { href: '/admin/reorder',  label: 'Reorder' },
   { href: '/admin/hosts',    label: 'Hosts' },
   { href: '/admin/users',    label: 'Users' },
   { href: '/admin/reviews',  label: 'Reviews' },

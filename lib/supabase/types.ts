@@ -59,6 +59,7 @@ export interface Database {
           house_rules: string[]
           is_featured: boolean
           is_active: boolean
+          display_order: number
           created_at: string
           updated_at: string
         }
@@ -88,6 +89,7 @@ export interface Database {
           house_rules?: string[]
           is_featured?: boolean
           is_active?: boolean
+          display_order?: number
           created_at?: string
           updated_at?: string
         }
@@ -116,6 +118,7 @@ export interface Database {
           house_rules?: string[]
           is_featured?: boolean
           is_active?: boolean
+          display_order?: number
           updated_at?: string
         }
       }

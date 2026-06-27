@@ -57,7 +57,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
           {listing.location}
         </p>
         <p className="text-sm text-[var(--muted)] mt-0.5">
-          {listing.bedrooms} bedroom{listing.bedrooms !== 1 ? "s" : ""} ·{" "}
+          {listing.bedrooms} bed{listing.bedrooms !== 1 ? "s" : ""} ·{" "}
           {listing.max_guests} guest{listing.max_guests !== 1 ? "s" : ""}
         </p>
         <p className="mt-2">
