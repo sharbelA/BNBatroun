@@ -25,16 +25,6 @@ function parseList(value: string | null): string[] {
   return value ? value.split(",").filter(Boolean) : [];
 }
 
-const LABEL = "mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-warm-400";
-const PILL_BASE = "inline-flex min-h-[44px] items-center rounded-full border px-4 text-sm font-medium transition-colors duration-150";
-const PILL_IDLE = "border-warm-200 bg-white text-warm-600 hover:border-[var(--accent)]/40 hover:bg-[var(--accent-light)]";
-const PILL_ACTIVE = "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]";
-const INPUT = "h-11 w-28 rounded-full border border-warm-200 bg-white px-4 text-sm text-warm-900 placeholder:text-warm-300 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)] transition-colors duration-150";
-
-function pillClass(active: boolean) {
-  return `${PILL_BASE} ${active ? PILL_ACTIVE : PILL_IDLE}`;
-}
-
 export default function Filters({
   resultCount,
   basePath,
@@ -94,11 +84,12 @@ export default function Filters({
   }
 
   const panel = (
-    <div className="flex flex-col gap-8">
-
+    <div className="flex flex-col gap-6">
       {/* Area */}
       <div>
-        <p className={LABEL}>Area</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
+          Area
+        </p>
         <div className="flex flex-wrap gap-2">
           {BATROUN_AREAS.map((a) => {
             const active = area === a.name;
@@ -107,8 +98,13 @@ export default function Filters({
                 key={a.slug}
                 type="button"
                 onClick={() => update({ area: active ? null : a.name })}
-                className={pillClass(active)}
+                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
+                  active
+                    ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
+                    : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
+                }`}
               >
+                <span className="mr-1.5">{a.emoji}</span>
                 {a.name}
               </button>
             );
@@ -116,11 +112,11 @@ export default function Filters({
         </div>
       </div>
 
-      <hr className="border-warm-100" />
-
       {/* Amenities */}
       <div>
-        <p className={LABEL}>Amenities</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
+          Amenities
+        </p>
         <div className="flex flex-wrap gap-2">
           {AMENITY_FILTER_KEYS.map((key) => {
             const active = amenities.includes(key);
@@ -129,7 +125,11 @@ export default function Filters({
                 key={key}
                 type="button"
                 onClick={() => toggleAmenity(key)}
-                className={pillClass(active)}
+                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
+                  active
+                    ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
+                    : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
+                }`}
               >
                 {AMENITY_FILTER_LABELS[key]}
               </button>
@@ -138,12 +138,12 @@ export default function Filters({
         </div>
       </div>
 
-      <hr className="border-warm-100" />
-
       {/* Price range */}
       <div>
-        <p className={LABEL}>Price per night (USD)</p>
-        <div className="flex items-center gap-3">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
+          Price per night (USD)
+        </p>
+        <div className="flex items-center gap-2">
           <input
             type="number"
             min={0}
@@ -151,9 +151,9 @@ export default function Filters({
             placeholder="Min"
             defaultValue={minPrice}
             onBlur={(e) => update({ minPrice: e.target.value || null })}
-            className={INPUT}
+            className="h-9 w-24 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
           />
-          <span className="text-warm-300">–</span>
+          <span className="text-sm text-warm-400">–</span>
           <input
             type="number"
             min={0}
@@ -161,16 +161,16 @@ export default function Filters({
             placeholder="Max"
             defaultValue={maxPrice}
             onBlur={(e) => update({ maxPrice: e.target.value || null })}
-            className={INPUT}
+            className="h-9 w-24 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
           />
         </div>
       </div>
 
-      <hr className="border-warm-100" />
-
       {/* Bedrooms */}
       <div>
-        <p className={LABEL}>Bedrooms</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
+          Bedrooms
+        </p>
         <div className="flex flex-wrap gap-2">
           {BEDROOM_OPTIONS.map((n) => {
             const value = String(n);
@@ -180,7 +180,11 @@ export default function Filters({
                 key={n}
                 type="button"
                 onClick={() => update({ bedrooms: active ? null : value })}
-                className={pillClass(active)}
+                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
+                  active
+                    ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
+                    : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
+                }`}
               >
                 {n === 4 ? "4+" : n}
               </button>
@@ -189,15 +193,15 @@ export default function Filters({
         </div>
       </div>
 
-      <hr className="border-warm-100" />
-
       {/* Max guests */}
       <div>
-        <p className={LABEL}>Guests</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
+          Guests
+        </p>
         <select
           value={maxGuests}
           onChange={(e) => update({ maxGuests: e.target.value || null })}
-          className="h-11 rounded-full border border-warm-200 bg-white px-4 pr-8 text-sm text-warm-700 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)] transition-colors duration-150 appearance-none cursor-pointer"
+          className="h-9 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-700 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
         >
           <option value="">Any</option>
           {[1, 2, 4, 6, 8, 10].map((n) => (
@@ -212,9 +216,9 @@ export default function Filters({
         <button
           type="button"
           onClick={reset}
-          className="self-start text-xs font-semibold uppercase tracking-[0.12em] text-warm-400 hover:text-[var(--accent)] transition-colors duration-150"
+          className="self-start text-sm font-medium text-[var(--accent)] hover:underline"
         >
-          Clear all
+          Reset filters
         </button>
       )}
     </div>
@@ -229,7 +233,7 @@ export default function Filters({
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="inline-flex h-11 items-center gap-2 rounded-full border border-warm-200 bg-white px-4 text-sm font-medium text-warm-700"
+          className="inline-flex h-11 items-center gap-2 rounded-full border border-[var(--border-light)] bg-white px-4 text-sm font-medium text-warm-700"
         >
           <FilterIcon />
           Filters
@@ -245,10 +249,9 @@ export default function Filters({
       </div>
 
       {/* Desktop inline panel */}
-      <div className="hidden rounded-2xl border border-warm-100 bg-white p-8 shadow-sm md:block">
+      <div className="hidden rounded-2xl border border-[var(--border-light)] bg-white p-6 md:block">
         {panel}
       </div>
-
       {/* Mobile bottom sheet */}
       {sheetOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
@@ -260,7 +263,7 @@ export default function Filters({
 
           <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-2xl bg-white shadow-xl">
 
-            <div className="border-b border-warm-100 p-5">
+            <div className="border-b border-[var(--border-light)] p-5">
               <h2 className="text-base font-semibold text-warm-900">
                 Filters
               </h2>
@@ -270,11 +273,11 @@ export default function Filters({
               {panel}
             </div>
 
-            <div className="border-t border-warm-100 p-4">
+            <div className="border-t border-[var(--border-light)] p-4">
               <button
                 type="button"
                 onClick={() => setSheetOpen(false)}
-                className="w-full rounded-full bg-[var(--accent)] py-3 text-sm font-medium text-white"
+                className="w-full rounded-xl bg-[var(--accent)] py-3 text-sm font-medium text-white"
               >
                 Done
               </button>
@@ -283,6 +286,6 @@ export default function Filters({
           </div>
         </div>
       )}
-    </div>
+    </div>   
   );
 }

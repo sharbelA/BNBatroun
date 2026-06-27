@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { CheckCircle, MessageCircle, MapPin } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Container } from '@/components/ui'
 
@@ -21,13 +20,13 @@ export default function AboutPage() {
           <Container className="text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--accent-light)] text-[var(--accent)] text-xs font-semibold mb-7 tracking-[0.15em] uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
-              Since 2026
+              Since 2025
             </div>
             <h1 className="mb-5 text-4xl md:text-6xl tracking-tight text-warm-900 animate-page-in">
               About BNBatroun
             </h1>
             <p className="mx-auto max-w-xl text-lg leading-relaxed text-warm-500">
-              A curated collection of chalets in Batroun, Lebanon, where the
+              A curated collection of chalets in Batroun, Lebanon — where the
               mountains meet the Mediterranean.
             </p>
           </Container>
@@ -39,13 +38,13 @@ export default function AboutPage() {
             <div className="mx-auto max-w-2xl">
               <h2 className="text-2xl md:text-3xl text-warm-900 mb-6 section-title">Our story</h2>
               <p className="leading-relaxed text-warm-600 mb-4">
-                BNBatroun, your bed-and-breakfast network in Batroun, was built
+                BNBatroun — your bed-and-breakfast network in Batroun — was built
                 to connect travelers with the best chalets in North Lebanon.
                 Every property is hand-selected and verified to ensure an
                 authentic, comfortable stay.
               </p>
               <p className="leading-relaxed text-warm-600">
-                Booking is simple and personal. All inquiries go directly to the
+                Booking is simple and personal — all inquiries go directly to the
                 host via WhatsApp, keeping things human and fast.
               </p>
             </div>
@@ -67,7 +66,7 @@ export default function AboutPage() {
               </p>
               <p className="leading-relaxed text-warm-300">
                 Whether you want a sea-view villa, a stone chalet in the pine
-                forests, or a poolside retreat, Batroun has it all, and BNBatroun
+                forests, or a poolside retreat, Batroun has it all — and BNBatroun
                 helps you find it.
               </p>
             </div>
@@ -79,22 +78,16 @@ export default function AboutPage() {
           <Container>
             <div className="mx-auto max-w-3xl">
               <h2 className="text-2xl md:text-3xl text-warm-900 mb-14 text-center">What makes us different</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-14 md:gap-10">
-                {([
-                  { Icon: CheckCircle, title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
-                  { Icon: MessageCircle, title: 'WhatsApp-first', desc: 'Book directly with hosts. No middlemen, no hidden fees.' },
-                  { Icon: MapPin, title: 'Batroun experts', desc: 'Local knowledge baked in. We know every beach, trail, and restaurant.' },
-                ] as const).map(({ Icon, title, desc }) => (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                {[
+                  { icon: '✋', title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
+                  { icon: '💬', title: 'WhatsApp-first', desc: 'Book directly with hosts — no middlemen, no hidden fees.' },
+                  { icon: '📍', title: 'Batroun experts', desc: 'Local knowledge baked in — we know every beach, trail, and restaurant.' },
+                ].map(({ icon, title, desc }) => (
                   <div key={title} className="text-center">
-                    <div className="flex justify-center mb-6">
-                      <Icon
-                        size={36}
-                        strokeWidth={1.25}
-                        className="text-[var(--accent)] opacity-80"
-                      />
-                    </div>
-                    <h3 className="text-xl md:text-2xl text-warm-900 mb-3">{title}</h3>
-                    <p className="text-base text-warm-500 leading-relaxed">{desc}</p>
+                    <div className="text-3xl mb-4">{icon}</div>
+                    <h3 className="text-lg text-warm-900 mb-2">{title}</h3>
+                    <p className="text-sm text-warm-500 leading-relaxed">{desc}</p>
                   </div>
                 ))}
               </div>
