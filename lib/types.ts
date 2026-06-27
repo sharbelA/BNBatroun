@@ -6,6 +6,7 @@ export interface Listing {
   host_id: string;
   title: string;
   slug: string;
+  internal_name: string | null;
   description: string;
   location: string;
   price: number;

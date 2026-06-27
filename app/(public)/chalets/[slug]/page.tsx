@@ -9,6 +9,7 @@ import { BookingProvider } from "./_components/BookingContext";
 import GuestBookingCalendar from "./_components/GuestBookingCalendar";
 import AvailabilityCalendar from "@/components/calendar/AvailabilityCalendar";
 import ExpandableTextClient from "./_components/ExpandableText";
+import { getCurrentUser } from "@/app/_actions/auth";
 import MobileBookingBar from "./_components/MobileBookingBar";
 import ReviewSection from "./_components/ReviewSection";
 
@@ -55,6 +56,8 @@ export default async function ChaletDetailPage(
   if (!data || !data.listing.is_active) notFound();
 
   const { listing, images, rooms, availability } = data;
+  const user = await getCurrentUser();
+  const isAdmin = user?.role === "admin";
 
   const amenities: { key: keyof typeof AMENITY_MAP; label: string }[] = (
     Object.keys(AMENITY_MAP) as (keyof typeof AMENITY_MAP)[]
@@ -86,6 +89,11 @@ export default async function ChaletDetailPage(
                     <h1 className="text-2xl sm:text-3xl md:text-4xl leading-tight break-words">
                       {listing.title}
                     </h1>
+                    {isAdmin && listing.internal_name && (
+                      <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded bg-warm-100 text-warm-500 text-xs font-medium">
+                        🔒 {listing.internal_name}
+                      </span>
+                    )}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[var(--muted)] text-sm">
                       <span className="flex items-center gap-1">
                         <Icon name="mapPin" size={14} />

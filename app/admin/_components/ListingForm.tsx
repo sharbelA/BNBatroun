@@ -128,6 +128,21 @@ export default function ListingForm({
           />
         </Field>
 
+        <Field
+          label="Internal name (admin only)"
+          htmlFor="internal_name"
+          hint="Only visible to admins — use the real chalet name"
+        >
+          <input
+            id="internal_name"
+            name="internal_name"
+            type="text"
+            defaultValue={listing?.internal_name ?? ""}
+            placeholder="e.g. Villa Sarkis - Edde"
+            className={inputCls}
+          />
+        </Field>
+
         <Field label="Area" htmlFor="location">
           <select
             id="location"
