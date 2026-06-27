@@ -12,7 +12,7 @@ interface ListingItem {
   location: string;
   price: number;
   is_active: boolean;
-  cover_image: string | null;
+  images: string[];
 }
 
 export default function ReorderGrid({
@@ -157,9 +157,9 @@ export default function ReorderGrid({
 
             {/* Thumbnail */}
             <div className="w-16 h-12 rounded-lg overflow-hidden bg-sand-100 shrink-0 relative">
-              {listing.cover_image ? (
+              {listing.images[0] ? (
                 <Image
-                  src={listing.cover_image}
+                  src={listing.images[0]}
                   alt={listing.title}
                   fill
                   className="object-cover"
