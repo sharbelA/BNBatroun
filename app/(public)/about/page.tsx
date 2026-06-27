@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { CheckCircle, MessageCircle, MapPin } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Container } from '@/components/ui'
 
@@ -78,16 +79,22 @@ export default function AboutPage() {
           <Container>
             <div className="mx-auto max-w-3xl">
               <h2 className="text-2xl md:text-3xl text-warm-900 mb-14 text-center">What makes us different</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                {[
-                  { icon: '✋', title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
-                  { icon: '💬', title: 'WhatsApp-first', desc: 'Book directly with hosts. No middlemen, no hidden fees.' },
-                  { icon: '📍', title: 'Batroun experts', desc: 'Local knowledge baked in. We know every beach, trail, and restaurant.' },
-                ].map(({ icon, title, desc }) => (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-14 md:gap-10">
+                {([
+                  { Icon: CheckCircle, title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
+                  { Icon: MessageCircle, title: 'WhatsApp-first', desc: 'Book directly with hosts. No middlemen, no hidden fees.' },
+                  { Icon: MapPin, title: 'Batroun experts', desc: 'Local knowledge baked in. We know every beach, trail, and restaurant.' },
+                ] as const).map(({ Icon, title, desc }) => (
                   <div key={title} className="text-center">
-                    <div className="text-3xl mb-4">{icon}</div>
-                    <h3 className="text-lg text-warm-900 mb-2">{title}</h3>
-                    <p className="text-sm text-warm-500 leading-relaxed">{desc}</p>
+                    <div className="flex justify-center mb-6">
+                      <Icon
+                        size={36}
+                        strokeWidth={1.25}
+                        className="text-[var(--accent)] opacity-80"
+                      />
+                    </div>
+                    <h3 className="text-xl md:text-2xl text-warm-900 mb-3">{title}</h3>
+                    <p className="text-base text-warm-500 leading-relaxed">{desc}</p>
                   </div>
                 ))}
               </div>
