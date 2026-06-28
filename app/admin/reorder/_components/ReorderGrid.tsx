@@ -1,24 +1,14 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
-import Image from "next/image";
 import { toast } from "sonner";
 import { reorderListingsAction } from "@/app/_actions/reorder-listings";
-
-interface ListingItem {
-  id: string;
-  title: string;
-  internal_name: string | null;
-  location: string;
-  price: number;
-  is_active: boolean;
-  images: string[];
-}
+import type { AdminListing } from "@/lib/supabase/queries/admin";
 
 export default function ReorderGrid({
   listings: initial,
 }: {
-  listings: ListingItem[];
+  listings: AdminListing[];
 }) {
   const [listings, setListings] = useState(initial);
   const [isPending, startTransition] = useTransition();
@@ -26,7 +16,6 @@ export default function ReorderGrid({
   const gridRef = useRef<HTMLDivElement>(null);
   const touchRef = useRef<{ currentIndex: number } | null>(null);
 
-  /* ─── Desktop drag ─── */
   function handleDragOver(e: React.DragEvent, index: number) {
     e.preventDefault();
     if (dragIndex === null || dragIndex === index) return;
@@ -44,7 +33,6 @@ export default function ReorderGrid({
     save();
   }
 
-  /* ─── Touch drag ─── */
   function handleTouchStart(index: number) {
     touchRef.current = { currentIndex: index };
     setDragIndex(index);
@@ -83,7 +71,6 @@ export default function ReorderGrid({
     save();
   }
 
-  /* ─── Move buttons ─── */
   function move(from: number, to: number) {
     if (to < 0 || to >= listings.length) return;
     setListings((prev) => {
@@ -95,17 +82,11 @@ export default function ReorderGrid({
     save();
   }
 
-  /* ─── Save ─── */
   function save() {
     startTransition(async () => {
-      const result = await reorderListingsAction(
-        listings.map((l) => l.id)
-      );
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Order saved");
-      }
+      const result = await reorderListingsAction(listings.map((l) => l.id));
+      if (result.error) toast.error(result.error);
+      else toast.success("Order saved");
     });
   }
 
@@ -138,12 +119,10 @@ export default function ReorderGrid({
                 : "border-sand-200 hover:border-warm-300"
             }`}
           >
-            {/* Order number */}
             <span className="text-lg font-bold text-warm-300 w-8 text-center shrink-0">
               {index + 1}
             </span>
 
-            {/* Drag handle */}
             <div className="text-warm-400 shrink-0 cursor-grab">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <circle cx="5" cy="3" r="1.5" />
@@ -155,24 +134,6 @@ export default function ReorderGrid({
               </svg>
             </div>
 
-            {/* Thumbnail */}
-            <div className="w-16 h-12 rounded-lg overflow-hidden bg-sand-100 shrink-0 relative">
-              {listing.images[0] ? (
-                <Image
-                  src={listing.images[0]}
-                  alt={listing.title}
-                  fill
-                  className="object-cover"
-                  sizes="64px"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-warm-300 text-xs">
-                  📷
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-warm-900 truncate">
                 {listing.title}
@@ -187,7 +148,6 @@ export default function ReorderGrid({
               </p>
             </div>
 
-            {/* Status */}
             <span
               className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
                 listing.is_active
@@ -198,7 +158,6 @@ export default function ReorderGrid({
               {listing.is_active ? "Active" : "Inactive"}
             </span>
 
-            {/* Arrow buttons */}
             <div className="flex flex-col gap-1 shrink-0">
               <button
                 onClick={() => move(index, index - 1)}
