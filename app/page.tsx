@@ -16,7 +16,7 @@ export default async function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
-        <ListingGrid listings={featured} title="Guest favourites in Lebanon" />
+        <ListingGrid listings={featured} title="Guest Favourites in Lebanon" />
         <ListingGrid listings={all} title="Explore all stays" bg="sand" />
       </main>
       <Footer />

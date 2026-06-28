@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
-import { Container } from '@/components/ui'
+import { Container, Icon } from '@/components/ui'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -26,7 +26,7 @@ export default function AboutPage() {
               About BNBatroun
             </h1>
             <p className="mx-auto max-w-xl text-lg leading-relaxed text-warm-500">
-              A curated collection of chalets in Batroun, Lebanon — where the
+              A curated collection of chalets in Batroun, Lebanon, where the
               mountains meet the Mediterranean.
             </p>
           </Container>
@@ -38,20 +38,20 @@ export default function AboutPage() {
             <div className="mx-auto max-w-2xl">
               <h2 className="text-2xl md:text-3xl text-warm-900 mb-6 section-title">Our story</h2>
               <p className="leading-relaxed text-warm-600 mb-4">
-                BNBatroun — your bed-and-breakfast network in Batroun — was built
+                BNBatroun is your bed-and-breakfast network in Batroun, built
                 to connect travelers with the best chalets in North Lebanon.
                 Every property is hand-selected and verified to ensure an
                 authentic, comfortable stay.
               </p>
               <p className="leading-relaxed text-warm-600">
-                Booking is simple and personal — all inquiries go directly to the
+                Booking is simple and personal. All inquiries go directly to the
                 host via WhatsApp, keeping things human and fast.
               </p>
             </div>
           </Container>
         </section>
 
-        {/* Why Batroun — dark section */}
+        {/* Why Batroun */}
         <section className="bg-warm-900 text-white py-20 md:py-28">
           <Container>
             <div className="mx-auto max-w-2xl">
@@ -66,7 +66,7 @@ export default function AboutPage() {
               </p>
               <p className="leading-relaxed text-warm-300">
                 Whether you want a sea-view villa, a stone chalet in the pine
-                forests, or a poolside retreat, Batroun has it all — and BNBatroun
+                forests, or a poolside retreat, Batroun has it all, and BNBatroun
                 helps you find it.
               </p>
             </div>
@@ -76,20 +76,38 @@ export default function AboutPage() {
         {/* Values */}
         <section className="bg-sand-50 py-20 md:py-28">
           <Container>
-            <div className="mx-auto max-w-3xl">
-              <h2 className="text-2xl md:text-3xl text-warm-900 mb-14 text-center">What makes us different</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                {[
-                  { icon: '✋', title: 'Handpicked', desc: 'Every chalet is personally visited and verified before listing.' },
-                  { icon: '💬', title: 'WhatsApp-first', desc: 'Book directly with hosts — no middlemen, no hidden fees.' },
-                  { icon: '📍', title: 'Batroun experts', desc: 'Local knowledge baked in — we know every beach, trail, and restaurant.' },
-                ].map(({ icon, title, desc }) => (
-                  <div key={title} className="text-center">
-                    <div className="text-3xl mb-4">{icon}</div>
-                    <h3 className="text-lg text-warm-900 mb-2">{title}</h3>
-                    <p className="text-sm text-warm-500 leading-relaxed">{desc}</p>
+            <div className="mx-auto max-w-4xl">
+              <h2 className="text-2xl md:text-3xl text-warm-900 mb-16 text-center">What makes us different</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+                <div className="text-center">
+                  <div className="flex justify-center mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center">
+                      <Icon name="check" size={28} stroke="var(--accent)" strokeWidth={2} />
+                    </div>
                   </div>
-                ))}
+                  <h3 className="text-xl md:text-2xl text-warm-900 mb-3" style={{ fontFamily: 'var(--font-heading)' }}>Handpicked</h3>
+                  <p className="text-base text-warm-500 leading-relaxed">Every chalet is personally visited and verified before listing.</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="flex justify-center mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center">
+                      <Icon name="whatsapp" size={28} stroke="var(--accent)" strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl text-warm-900 mb-3" style={{ fontFamily: 'var(--font-heading)' }}>WhatsApp-first</h3>
+                  <p className="text-base text-warm-500 leading-relaxed">Book directly with hosts. No middlemen, no hidden fees.</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="flex justify-center mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center">
+                      <Icon name="mapPin" size={28} stroke="var(--accent)" strokeWidth={2} />
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl text-warm-900 mb-3" style={{ fontFamily: 'var(--font-heading)' }}>Batroun experts</h3>
+                  <p className="text-base text-warm-500 leading-relaxed">Local knowledge baked in. We know every beach, trail, and restaurant.</p>
+                </div>
               </div>
             </div>
           </Container>

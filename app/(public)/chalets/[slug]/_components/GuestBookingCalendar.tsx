@@ -150,7 +150,7 @@ export default function GuestBookingCalendar({ availability }: Props) {
         {step === "checkin" && "👆 Tap a date to set your check-in"}
         {step === "checkout" && checkIn && (
           <>
-            Check-in: <strong>{format(checkIn, "MMM d")}</strong> — now tap
+            Check-in: <strong>{format(checkIn, "MMM d")}</strong>. Now tap
             your check-out date
           </>
         )}

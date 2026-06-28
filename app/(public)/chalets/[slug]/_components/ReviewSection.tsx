@@ -74,7 +74,7 @@ export default async function ReviewSection({
         </div>
       ) : (
         <p className="text-sm text-[var(--muted)]">
-          No reviews yet — be the first to share your experience!
+          No reviews yet. Be the first to share your experience!
         </p>
       )}
 

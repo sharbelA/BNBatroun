@@ -84,7 +84,7 @@ export default function Filters({
   }
 
   const panel = (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {/* Area */}
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
@@ -98,13 +98,12 @@ export default function Filters({
                 key={a.slug}
                 type="button"
                 onClick={() => update({ area: active ? null : a.name })}
-                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
+                className={`inline-flex h-9 items-center rounded-full border px-4 text-xs font-medium transition ${
                   active
                     ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
                     : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
                 }`}
               >
-                <span className="mr-1.5">{a.emoji}</span>
                 {a.name}
               </button>
             );
@@ -125,7 +124,7 @@ export default function Filters({
                 key={key}
                 type="button"
                 onClick={() => toggleAmenity(key)}
-                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
+                className={`inline-flex h-9 items-center rounded-full border px-4 text-xs font-medium transition ${
                   active
                     ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
                     : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
@@ -151,7 +150,7 @@ export default function Filters({
             placeholder="Min"
             defaultValue={minPrice}
             onBlur={(e) => update({ minPrice: e.target.value || null })}
-            className="h-9 w-24 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
+            className="h-9 w-24 rounded-full border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
           />
           <span className="text-sm text-warm-400">–</span>
           <input
@@ -161,7 +160,7 @@ export default function Filters({
             placeholder="Max"
             defaultValue={maxPrice}
             onBlur={(e) => update({ maxPrice: e.target.value || null })}
-            className="h-9 w-24 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
+            className="h-9 w-24 rounded-full border border-[var(--border-light)] bg-white px-3 text-sm text-warm-900 placeholder:text-warm-400 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
           />
         </div>
       </div>
@@ -180,7 +179,7 @@ export default function Filters({
                 key={n}
                 type="button"
                 onClick={() => update({ bedrooms: active ? null : value })}
-                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition ${
+                className={`inline-flex h-9 items-center rounded-full border px-4 text-xs font-medium transition ${
                   active
                     ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
                     : "border-[var(--border-light)] bg-white text-warm-600 hover:border-[var(--accent)]/30 hover:bg-[var(--surface)]"
@@ -201,7 +200,7 @@ export default function Filters({
         <select
           value={maxGuests}
           onChange={(e) => update({ maxGuests: e.target.value || null })}
-          className="h-9 rounded-lg border border-[var(--border-light)] bg-white px-3 text-sm text-warm-700 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
+          className="h-9 rounded-full border border-[var(--border-light)] bg-white px-3 text-sm text-warm-700 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-light)]"
         >
           <option value="">Any</option>
           {[1, 2, 4, 6, 8, 10].map((n) => (

@@ -142,7 +142,7 @@ export default function ImageCarousel({
             {!failedImages.has(i) ? (
               <Image
                 src={src}
-                alt={`${alt} — photo ${i + 1}`}
+                alt={`${alt}, photo ${i + 1}`}
                 fill
                 sizes={sizes}
                 className="object-cover"

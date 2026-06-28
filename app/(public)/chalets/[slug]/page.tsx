@@ -26,7 +26,7 @@ export async function generateMetadata(
   const description = listing.description.slice(0, 160);
 
   return {
-    title: `${listing.title} — ${listing.bedrooms}BR in Batroun | BNBatroun`,
+    title: `${listing.title}, ${listing.bedrooms}BR in Batroun | BNBatroun`,
     description,
     openGraph: {
       title: listing.title,
