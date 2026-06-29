@@ -26,53 +26,62 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session — do NOT remove this or auth will break.
+  // Refresh session so server components always see a valid session.
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
 
-  // Protect /host/* routes
+  // ── /host/* — authentication only ────────────────────────────
+  //
+  // The host portal data layer already filters everything by host_id = auth.uid(),
+  // so a guest who somehow reaches /host/dashboard sees "No chalets yet" and cannot
+  // touch any data. Keeping role-gating here causes a profile DB query on every
+  // /host/* request — including /host/login — which made router.refresh() hang
+  // indefinitely after sign-in. Authentication check is sufficient in middleware.
   if (pathname.startsWith('/host') && !pathname.startsWith('/host/login')) {
     if (!user) {
       return NextResponse.redirect(new URL('/host/login', request.url))
     }
-    // Verify role via profiles table
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single() as { data: { role: string } | null }
-
-    if (!profile || (profile.role !== 'host' && profile.role !== 'admin')) {
-      return NextResponse.redirect(new URL('/host/login', request.url))
-    }
   }
 
-  // Protect /admin/* routes
+  // ── /admin/* — authentication + admin role ───────────────────
+  //
+  // Admin routes need the role check because admins can read and write all data.
+  // Profile query only runs for /admin/* paths, never for /host/* paths.
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     if (!user) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
-    const { data: profile } = await supabase
+    const { data: profileData } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single() as { data: { role: string } | null }
-
-    if (!profile || profile.role !== 'admin') {
+      .single() as unknown as { data: { role: string } | null }
+    if (!profileData || profileData.role !== 'admin') {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
 
-  // Redirect authenticated users away from login/signup pages
+  // ── Redirect authenticated users away from login pages ───────
   if (user) {
+    // For /host/login: redirect any authenticated user to the dashboard.
+    // No role query needed — if they shouldn't be there the page shows an empty state.
     if (pathname === '/host/login') {
       return NextResponse.redirect(new URL('/host/dashboard', request.url))
     }
+    // For /admin/login: only redirect confirmed admins (prevents non-admins from
+    // getting bounced to a forbidden page).
     if (pathname === '/admin/login') {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url))
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single() as unknown as { data: { role: string } | null }
+      if (profileData?.role === 'admin') {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url))
+      }
     }
     if (pathname === '/login' || pathname === '/signup') {
       return NextResponse.redirect(new URL('/', request.url))
@@ -84,7 +93,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals, static files, and public assets
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Skip Next.js internals, static files, and public assets.
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webpt)$).*)',
   ],
 }

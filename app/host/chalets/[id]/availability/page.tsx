@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCurrentUser } from '@/app/_actions/auth'
-import { getAdminListingById } from '@/lib/supabase/queries/admin'
-import { getListingAvailabilityWindow } from '@/lib/supabase/queries/listings'
+import { getHostListingById, getListingAvailabilityWindow } from '@/lib/supabase/queries/listings'
 import AvailabilityCalendar from '@/components/calendar/AvailabilityCalendar'
 
 export const metadata: Metadata = { title: 'Manage availability' }
@@ -15,8 +14,8 @@ export default async function HostAvailabilityPage(
   const user = await getCurrentUser()
   if (!user) notFound()
 
-  const listing = await getAdminListingById(id)
-  if (!listing || listing.host_id !== user.id) notFound()
+  const listing = await getHostListingById(id, user.id)
+  if (!listing) notFound()
 
   const availability = await getListingAvailabilityWindow(id)
 
@@ -37,8 +36,11 @@ export default async function HostAvailabilityPage(
       {/* Page header */}
       <div className="mb-8 pb-6 border-b border-[var(--border-light)]">
         <h1 className="text-2xl font-semibold text-[var(--foreground)] mb-1.5">
-          {listing.title}
+          Managing availability: {listing.internal_name ?? listing.title}
         </h1>
+        {listing.internal_name && (
+          <p className="text-xs text-[var(--muted)] italic mb-1">{listing.title}</p>
+        )}
         <p className="text-sm text-[var(--muted)]">
           Manage your chalet&apos;s availability calendar
         </p>

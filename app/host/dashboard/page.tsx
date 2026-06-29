@@ -6,10 +6,27 @@ import { getHostListings } from "@/lib/supabase/queries/listings";
 import { Icon } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Host dashboard" };
+// Always render dynamically — this page reads cookies (auth session).
+export const dynamic = "force-dynamic";
 
 export default async function HostDashboardPage() {
-  const user = await getCurrentUser();
-  const listings = user ? await getHostListings(user.id) : [];
+  let listings: Awaited<ReturnType<typeof getHostListings>> = [];
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      listings = await getHostListings(user.id);
+    }
+  } catch (err: unknown) {
+    // Log the full error so the terminal shows exactly what went wrong.
+    console.error("[host/dashboard] data fetch failed:", err);
+    if (err instanceof Error) {
+      console.error("[host/dashboard] message:", err.message);
+      console.error("[host/dashboard] stack:", err.stack);
+    } else {
+      console.error("[host/dashboard] (non-Error thrown):", JSON.stringify(err));
+    }
+    // listings stays [] → render the empty/fallback state below.
+  }
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-12 md:px-6 md:py-16">
@@ -46,7 +63,7 @@ export default async function HostDashboardPage() {
                 {listing.cover_image ? (
                   <Image
                     src={listing.cover_image}
-                    alt={listing.title}
+                    alt={listing.title ?? "Chalet"}
                     fill
                     className="object-cover"
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
@@ -61,11 +78,14 @@ export default async function HostDashboardPage() {
               {/* Card body */}
               <div className="p-5 flex flex-col gap-1 flex-1">
                 <h2 className="text-base font-semibold text-[var(--foreground)]">
-                  {listing.title}
+                  {listing.internal_name ?? listing.title ?? "Unnamed chalet"}
                 </h2>
+                {listing.internal_name ? (
+                  <p className="text-xs text-[var(--muted)] italic">{listing.title}</p>
+                ) : null}
                 <p className="flex items-center gap-1 text-xs text-[var(--muted)]">
                   <Icon name="mapPin" size={13} />
-                  {listing.location}
+                  {listing.location ?? "—"}
                 </p>
 
                 <Link

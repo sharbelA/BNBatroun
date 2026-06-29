@@ -31,7 +31,10 @@ function toListing(row: DbListing & { listing_images?: ImageRow[] }): Listing {
   const images = (row.listing_images ?? [])
     .sort((a, b) => a.display_order - b.display_order)
     .map((i) => i.url);
-  return { ...row, images, weekend_price: row.weekend_price ?? row.price };
+  // Strip internal_name: this helper is used only by public queries whose results
+  // reach client components (ListingCard). Nulling here prevents the value from
+  // being serialized into the browser payload.
+  return { ...row, images, weekend_price: row.weekend_price ?? row.price, internal_name: null };
 }
 
 export async function getListings(options: { featured?: boolean; limit?: number } = {}): Promise<Listing[]> {
@@ -126,27 +129,57 @@ export async function getActiveSlugs(): Promise<{ slug: string; updated_at: stri
 
 export type HostListing = DbListing & { cover_image: string | null };
 
-export async function getHostListings(hostId: string): Promise<HostListing[]> {
-  if (!isSupabaseConfigured) return [];
+export type HostListingDetail = Pick<
+  DbListing,
+  "id" | "host_id" | "title" | "internal_name" | "location"
+>;
+
+export async function getHostListingById(
+  listingId: string,
+  hostId: string
+): Promise<HostListingDetail | null> {
+  if (!isSupabaseConfigured) return null;
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from("listings")
-    .select("*, listing_images(url, display_order)")
+    .select("id, host_id, title, internal_name, location")
+    .eq("id", listingId)
     .eq("host_id", hostId)
-    .order("created_at", { ascending: false });
+    .single();
 
   if (error) {
-    console.error("[getHostListings]", error.message);
+    console.error("[getHostListingById]", error.message);
+    return null;
+  }
+  return data as HostListingDetail;
+}
+
+export async function getHostListings(hostId: string): Promise<HostListing[]> {
+  if (!isSupabaseConfigured) return [];
+  try {
+    const supabase = await getSupabase();
+    const { data, error } = await supabase
+      .from("listings")
+      .select("*, listing_images(url, display_order)")
+      .eq("host_id", hostId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("[getHostListings] supabase error:", error.message, error);
+      return [];
+    }
+
+    return (data ?? []).map((row) => {
+      const listing = row as DbListing & { listing_images?: ImageRow[] };
+      const images = (listing.listing_images ?? []).sort(
+        (a, b) => a.display_order - b.display_order
+      );
+      return { ...listing, cover_image: images[0]?.url ?? null };
+    });
+  } catch (err: unknown) {
+    console.error("[getHostListings] unexpected throw:", err);
     return [];
   }
-
-  return (data ?? []).map((row) => {
-    const listing = row as DbListing & { listing_images?: ImageRow[] };
-    const images = (listing.listing_images ?? []).sort(
-      (a, b) => a.display_order - b.display_order
-    );
-    return { ...listing, cover_image: images[0]?.url ?? null };
-  });
 }
 
 export async function getListingAvailabilityWindow(
