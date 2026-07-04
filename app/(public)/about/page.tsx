@@ -20,7 +20,7 @@ export default function AboutPage() {
           <Container className="text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--accent-light)] text-[var(--accent)] text-xs font-semibold mb-7 tracking-[0.15em] uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
-              Since 2025
+              Since 2026
             </div>
             <h1 className="mb-5 text-4xl md:text-6xl tracking-tight text-warm-900 animate-page-in">
               About BNBatroun
