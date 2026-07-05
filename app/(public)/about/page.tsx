@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { Container, Icon } from '@/components/ui'
 
+
 export const metadata: Metadata = {
   title: 'About',
   description:
@@ -88,16 +89,24 @@ export default function AboutPage() {
                   <h3 className="text-xl md:text-2xl text-warm-900 mb-3" style={{ fontFamily: 'var(--font-heading)' }}>Handpicked</h3>
                   <p className="text-base text-warm-500 leading-relaxed">Every chalet is personally visited and verified before listing.</p>
                 </div>
+<div className="text-center">
+  <div className="flex justify-center mb-6">
+    <div className="w-14 h-14 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center">
+      <Icon name="creditCard" size={28} stroke="var(--accent)" strokeWidth={2} />
+    </div>
+  </div>
 
-                <div className="text-center">
-                  <div className="flex justify-center mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center">
-                      <Icon name="whatsapp" size={28} stroke="var(--accent)" strokeWidth={1.5} />
-                    </div>
-                  </div>
-                  <h3 className="text-xl md:text-2xl text-warm-900 mb-3" style={{ fontFamily: 'var(--font-heading)' }}>WhatsApp-first</h3>
-                  <p className="text-base text-warm-500 leading-relaxed">Book directly with hosts. No middlemen, no hidden fees.</p>
-                </div>
+  <h3
+    className="text-xl md:text-2xl text-warm-900 mb-3"
+    style={{ fontFamily: "var(--font-heading)" }}
+  >
+    Easy booking
+  </h3>
+
+  <p className="text-base text-warm-500 leading-relaxed">
+Send us a WhatsApp and we'll confirm your booking, answer your questions, and make sure everything's ready. Pay securely through Whish.  </p>
+</div>
+          
 
                 <div className="text-center">
                   <div className="flex justify-center mb-6">

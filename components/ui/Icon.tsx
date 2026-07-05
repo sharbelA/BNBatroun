@@ -23,6 +23,13 @@ const icons = {
       <polyline points="9 22 9 12 15 12 15 22" />
     </>
   ),
+  creditCard: (
+  <>
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <line x1="2" y1="10" x2="22" y2="10" />
+    <circle cx="6" cy="15" r="1" />
+  </>
+),
   search: (
     <>
       <circle cx="11" cy="11" r="8" />
