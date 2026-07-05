@@ -237,6 +237,28 @@ export default function ListingForm({
               className={inputCls}
             />
           </Field>
+          <Field label="Guests included in base price" htmlFor="base_guests" hint="Extra guests are charged separately">
+            <input
+              id="base_guests"
+              name="base_guests"
+              type="number"
+              min={1}
+              required
+              defaultValue={listing?.base_guests ?? listing?.max_guests ?? 2}
+              className={inputCls}
+            />
+          </Field>
+          <Field label="Extra guest fee ($/night)" htmlFor="price_per_extra_guest" hint="0 = no extra charge">
+            <input
+              id="price_per_extra_guest"
+              name="price_per_extra_guest"
+              type="number"
+              min={0}
+              step="0.01"
+              defaultValue={listing?.price_per_extra_guest ?? 0}
+              className={inputCls}
+            />
+          </Field>
         </div>
       </section>
 

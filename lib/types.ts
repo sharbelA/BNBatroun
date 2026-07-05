@@ -14,6 +14,8 @@ export interface Listing {
   bedrooms: number;
   bathrooms: number;
   max_guests: number;
+  base_guests: number;
+  price_per_extra_guest: number;
   pet_friendly: boolean;
   pool: boolean;
   wifi: boolean;

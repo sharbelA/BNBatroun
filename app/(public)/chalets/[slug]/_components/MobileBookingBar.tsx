@@ -8,6 +8,8 @@ interface MobileBookingBarProps {
   price: number;
   weekendPrice: number;
   maxGuests: number;
+  baseGuests: number;
+  pricePerExtraGuest: number;
   title: string;
   slug: string;
   availability?: { date: string; status: string }[];
@@ -17,6 +19,8 @@ export default function MobileBookingBar({
   price,
   weekendPrice,
   maxGuests,
+  baseGuests,
+  pricePerExtraGuest,
   title,
   slug,
   availability,
@@ -68,6 +72,8 @@ export default function MobileBookingBar({
               price={price}
               weekendPrice={weekendPrice}
               maxGuests={maxGuests}
+              baseGuests={baseGuests}
+              pricePerExtraGuest={pricePerExtraGuest}
               title={title}
               slug={slug}
               availability={availability}

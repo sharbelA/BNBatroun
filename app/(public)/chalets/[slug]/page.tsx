@@ -263,6 +263,8 @@ export default async function ChaletDetailPage(
                   price={listing.price}
                   weekendPrice={listing.weekend_price ?? listing.price}
                   maxGuests={listing.max_guests}
+                  baseGuests={listing.base_guests ?? listing.max_guests}
+                  pricePerExtraGuest={listing.price_per_extra_guest ?? 0}
                   title={listing.title}
                   slug={listing.slug}
                   availability={availability}
@@ -277,6 +279,8 @@ export default async function ChaletDetailPage(
           price={listing.price}
           weekendPrice={listing.weekend_price ?? listing.price}
           maxGuests={listing.max_guests}
+          baseGuests={listing.base_guests ?? listing.max_guests}
+          pricePerExtraGuest={listing.price_per_extra_guest ?? 0}
           title={listing.title}
           slug={listing.slug}
           availability={availability}

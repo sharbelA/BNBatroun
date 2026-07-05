@@ -54,6 +54,8 @@ function parseFormData(formData: FormData) {
     bedrooms: parseInt(formData.get("bedrooms") as string) || 1,
     bathrooms: parseInt(formData.get("bathrooms") as string) || 1,
     max_guests: parseInt(formData.get("max_guests") as string) || 2,
+    base_guests: parseInt(formData.get("base_guests") as string) || 2,
+    price_per_extra_guest: parseFloat(formData.get("price_per_extra_guest") as string) || 0,
     latitude: formData.get("latitude")
       ? parseFloat(formData.get("latitude") as string)
       : null,

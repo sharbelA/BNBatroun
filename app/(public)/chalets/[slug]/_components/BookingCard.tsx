@@ -31,6 +31,8 @@ interface BookingCardProps {
   price: number;
   weekendPrice: number;
   maxGuests: number;
+  baseGuests: number;
+  pricePerExtraGuest: number;
   title: string;
   slug: string;
   availability?: AvailabilityEntry[];
@@ -47,6 +49,8 @@ export default function BookingCard({
   price,
   weekendPrice,
   maxGuests,
+  baseGuests,
+  pricePerExtraGuest,
   title,
   slug,
   availability = [],
@@ -156,12 +160,15 @@ export default function BookingCard({
       if (isWeekendNight(addDays(checkIn, i))) weekend++;
       else weekday++;
     }
+    const baseTotal = weekday * price + weekend * weekendPrice;
+    const extraGuests = Math.max(0, guests - baseGuests);
+    const extraGuestTotal = extraGuests * pricePerExtraGuest * nights;
     return {
       weekdayNights: weekday,
       weekendNights: weekend,
-      total: weekday * price + weekend * weekendPrice,
+      total: baseTotal + extraGuestTotal,
     };
-  }, [checkIn, nights, price, weekendPrice]);
+  }, [checkIn, nights, price, weekendPrice, guests, baseGuests, pricePerExtraGuest]);
 
   // Check if any unavailable date falls within the selected range
   const rangeConflict = useMemo(() => {
@@ -178,12 +185,17 @@ export default function BookingCard({
         : weekendNights > 0
           ? `${nights} weekend`
           : `${nights} weekday`;
+    const extraGuests = Math.max(0, guests - baseGuests);
+    const extraGuestLine = extraGuests > 0 && pricePerExtraGuest > 0
+      ? `💵 Extra guests: ${extraGuests} × $${pricePerExtraGuest}/night = $${(extraGuests * pricePerExtraGuest * nights).toLocaleString()}\n`
+      : '';
     const message = encodeURIComponent(
       `Hi! I'm interested in booking *${title}*\n\n` +
         `📅 Check-in: ${format(checkIn, "MMM d, yyyy")}\n` +
         `📅 Check-out: ${format(checkOut, "MMM d, yyyy")}\n` +
         `🌙 Nights: ${nightsDetail}\n` +
         `👥 Guests: ${guests}\n` +
+        extraGuestLine +
         `💰 Total: $${total.toLocaleString()}\n\n` +
         `Listing: ${SITE_URL}/chalets/${slug}`
     );
@@ -372,6 +384,11 @@ export default function BookingCard({
           </button>
         </div>
         <p className="text-xs text-[var(--muted)]">Max {maxGuests} guests</p>
+        {pricePerExtraGuest > 0 && (
+          <p className="text-xs text-[var(--accent)] mt-1">
+            Base price includes {baseGuests} guest{baseGuests !== 1 ? "s" : ""}. Each extra guest: +${pricePerExtraGuest}/night.
+          </p>
+        )}
       </div>
 
       {/* ── Price breakdown ── */}
@@ -394,6 +411,16 @@ export default function BookingCard({
               </span>
               <span className="text-[var(--foreground)] font-medium">
                 ${(weekdayNights * price).toLocaleString()}
+              </span>
+            </div>
+          )}
+          {guests > baseGuests && pricePerExtraGuest > 0 && (
+            <div className="flex justify-between text-[var(--muted)]">
+              <span>
+                {guests - baseGuests} extra guest{guests - baseGuests !== 1 ? "s" : ""} × ${pricePerExtraGuest}/night × {nights}
+              </span>
+              <span className="text-[var(--foreground)] font-medium">
+                ${((guests - baseGuests) * pricePerExtraGuest * nights).toLocaleString()}
               </span>
             </div>
           )}
