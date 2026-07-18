@@ -13,15 +13,80 @@ import type { ListingImage } from "@/lib/supabase/types";
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
 
+// ─── Compression settings ───
+const COMPRESS_MAX_WIDTH = 1600;
+const COMPRESS_QUALITY = 0.8; // JPEG quality 80%
+
 interface Props {
   listingId: string;
   initialImages: ListingImage[];
   supabaseUrl: string;
 }
 
+/**
+ * Compress an image client-side using Canvas before uploading.
+ * - Resizes to max 1600px wide (keeps aspect ratio, never upscales)
+ * - Converts to JPEG at quality 80%
+ * - Returns { blob, originalSize, compressedSize }
+ */
+function compressImage(
+  file: File
+): Promise<{ blob: Blob; originalSize: number; compressedSize: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.onload = () => {
+      try {
+        let { width, height } = img;
+
+        // Only downscale, never upscale
+        if (width > COMPRESS_MAX_WIDTH) {
+          height = Math.round((height * COMPRESS_MAX_WIDTH) / width);
+          width = COMPRESS_MAX_WIDTH;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas context failed"));
+          return;
+        }
+
+        // White background (handles PNG transparency → JPEG)
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Compression failed"));
+              return;
+            }
+            resolve({
+              blob,
+              originalSize: file.size,
+              compressedSize: blob.size,
+            });
+          },
+          "image/jpeg",
+          COMPRESS_QUALITY
+        );
+      } catch (err) {
+        reject(err);
+      }
+    };
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 export default function PhotoManager({ listingId, initialImages, supabaseUrl }: Props) {
   const [images, setImages] = useState<ListingImage[]>(initialImages);
   const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -36,9 +101,10 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
   } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  /* ─── File upload ─── */
+  /* ─── File upload (with compression) ─── */
   const handleFiles = useCallback(async (files: FileList | File[]) => {
     setError(null);
+    setUploadStatus(null);
     const fileArray = Array.from(files);
 
     for (const file of fileArray) {
@@ -53,27 +119,58 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
     }
 
     setUploading(true);
-    for (const file of fileArray) {
-      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i];
+      setUploadStatus(`Compressing & uploading ${i + 1}/${fileArray.length}...`);
+
+      // Compress before upload
+      let uploadBlob: Blob;
+      let originalSize = file.size;
+      let compressedSize = file.size;
+
+      try {
+        const result = await compressImage(file);
+        uploadBlob = result.blob;
+        originalSize = result.originalSize;
+        compressedSize = result.compressedSize;
+      } catch {
+        // If compression fails, upload original
+        uploadBlob = file;
+      }
+
+      // Always use .jpg extension since we compress to JPEG
+      const path = `${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
 
       const { error: uploadErr } = await supabase.storage
         .from("listing-photos")
-        .upload(path, file, { cacheControl: "3600", upsert: false });
+        .upload(path, uploadBlob, {
+          cacheControl: "31536000", // 1 year cache
+          upsert: false,
+          contentType: "image/jpeg",
+        });
 
       if (uploadErr) {
         setError(`Upload failed: ${uploadErr.message}`);
         setUploading(false);
+        setUploadStatus(null);
         return;
       }
 
       const url = `${supabaseUrl}/storage/v1/object/public/listing-photos/${path}`;
-      const result = await addPhotoAction(listingId, url, "");
-      if (result.error) {
-        setError(`Save failed: ${result.error}`);
+      const actionResult = await addPhotoAction(listingId, url, "");
+      if (actionResult.error) {
+        setError(`Save failed: ${actionResult.error}`);
         setUploading(false);
+        setUploadStatus(null);
         return;
       }
+
+      // Show compression result
+      const savedPct = Math.round((1 - compressedSize / originalSize) * 100);
+      const sizeMB = (sz: number) => (sz / (1024 * 1024)).toFixed(1);
+      setUploadStatus(
+        `Uploaded ${i + 1}/${fileArray.length}: ${sizeMB(originalSize)}MB → ${sizeMB(compressedSize)}MB (−${savedPct}%)`
+      );
     }
 
     setUploading(false);
@@ -180,6 +277,12 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
         </div>
       )}
 
+      {uploadStatus && !error && (
+        <div className="mb-4 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          {uploadStatus}
+        </div>
+      )}
+
       {/* Upload zone */}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -205,13 +308,13 @@ export default function PhotoManager({ listingId, initialImages, supabaseUrl }: 
         {uploading ? (
           <>
             <div className="mb-2 w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm font-medium">Uploading...</p>
+            <p className="text-sm font-medium">{uploadStatus || "Uploading..."}</p>
           </>
         ) : (
           <>
             <div className="mb-2 text-3xl text-[var(--muted)]">↑</div>
             <p className="text-sm font-medium">Click to upload or drag &amp; drop</p>
-            <p className="mt-1 text-xs text-[var(--muted)]">JPG, PNG, WebP · Max 5MB each</p>
+            <p className="mt-1 text-xs text-[var(--muted)]">JPG, PNG, WebP · Auto-compressed to save bandwidth</p>
           </>
         )}
       </div>
