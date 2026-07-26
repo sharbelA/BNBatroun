@@ -24,7 +24,7 @@ export default function Hero() {
             Your home away
             <br />
             From home in{" "}
-            <span className="text-[var(--accent)]">Lebanon</span>
+            <span className="text-[var(--accent)]">Batroun</span>
           </h1>
           <p className="mt-6 text-lg text-warm-500 max-w-md leading-relaxed">
             Discover handpicked chalets and villas on the Batroun coast.
