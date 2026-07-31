@@ -16,7 +16,7 @@ export default function ExpandableText({ text }: { text: string }) {
     <div>
       <div className="text-[var(--foreground)] leading-relaxed space-y-3">
         {displayed.map((p, i) => (
-          <p key={i} className="text-[15px]">
+          <p key={i} className="text-[15px] whitespace-pre-line">
             {p}
           </p>
         ))}
