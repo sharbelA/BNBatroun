@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 
 // Load env from .env.local (Next.js convention)
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -21,9 +21,27 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 const BUCKET = "listing-photos";
 const MAX_WIDTH = 1600;
 const JPEG_QUALITY = 80;
-const SKIP_UNDER_BYTES = 300 * 1024; // 300 KB
+const SKIP_UNDER_BYTES = 300 * 1024; // 300 KB — below this we don't bother resizing/compressing, but we still apply the cache header
+const CACHE_CONTROL = "31536000"; // 1 year
 
 const DRY_RUN = process.argv.includes("--dry-run");
+
+const EXT_CONTENT_TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  heic: "image/heic",
+  heif: "image/heif",
+  avif: "image/avif",
+  tif: "image/tiff",
+  tiff: "image/tiff",
+};
+
+function guessContentType(fileName: string): string {
+  const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
+  return EXT_CONTENT_TYPES[ext] ?? "application/octet-stream";
+}
 
 interface FileResult {
   path: string;
@@ -31,6 +49,7 @@ interface FileResult {
   newSize: number;
   saved: number;
   skipped: boolean;
+  cacheApplied: boolean;
   error?: string;
 }
 
@@ -100,6 +119,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
       newSize: 0,
       saved: 0,
       skipped: true,
+      cacheApplied: false,
       error: `Download failed: ${dlError?.message ?? "No data returned"}`,
     };
   }
@@ -107,14 +127,37 @@ async function compressFile(filePath: string): Promise<FileResult> {
   const originalBuffer = Buffer.from(await blob.arrayBuffer());
   const originalSize = originalBuffer.length;
 
-  // ─── 2. Skip small files ───
+  // ─── 2. Small files: don't resize/compress, but still apply the cache header ───
   if (originalSize < SKIP_UNDER_BYTES) {
+    if (!DRY_RUN) {
+      const { error: upError } = await supabase.storage
+        .from(BUCKET)
+        .upload(filePath, originalBuffer, {
+          upsert: true,
+          contentType: guessContentType(filePath),
+          cacheControl: CACHE_CONTROL,
+        });
+
+      if (upError) {
+        return {
+          path: filePath,
+          originalSize,
+          newSize: originalSize,
+          saved: 0,
+          skipped: true,
+          cacheApplied: false,
+          error: `Cache-only re-upload failed: ${upError.message}`,
+        };
+      }
+    }
+
     return {
       path: filePath,
       originalSize,
       newSize: originalSize,
       saved: 0,
       skipped: true,
+      cacheApplied: true,
     };
   }
 
@@ -129,6 +172,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
       newSize: originalSize,
       saved: 0,
       skipped: true,
+      cacheApplied: false,
       error: `Can't read metadata (corrupt/unsupported): ${err.message}`,
     };
   }
@@ -166,6 +210,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
       newSize: originalSize,
       saved: 0,
       skipped: true,
+      cacheApplied: false,
       error: `Compression failed: ${err.message}`,
     };
   }
@@ -183,22 +228,22 @@ async function compressFile(filePath: string): Promise<FileResult> {
       newSize: originalSize,
       saved: 0,
       skipped: true,
+      cacheApplied: false,
       error: `SAFETY: compressed image failed validation, skipping: ${err.message}`,
     };
   }
 
   const newSize = compressed.length;
 
-  // ─── 6. If compression didn't help, skip but still set cache header ───
+  // ─── 6. If compression didn't help, skip the resize but still set the cache header ───
   if (newSize >= originalSize) {
-    // Still worth setting cacheControl even if size didn't shrink
     if (!DRY_RUN) {
       const { error: upError } = await supabase.storage
         .from(BUCKET)
         .upload(filePath, originalBuffer, {
           upsert: true,
           contentType: outputContentType,
-          cacheControl: "31536000",
+          cacheControl: CACHE_CONTROL,
         });
 
       if (upError) {
@@ -208,6 +253,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
           newSize: originalSize,
           saved: 0,
           skipped: false,
+          cacheApplied: false,
           error: `Cache-only re-upload failed: ${upError.message}`,
         };
       }
@@ -219,6 +265,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
       newSize: originalSize,
       saved: 0,
       skipped: true,
+      cacheApplied: true,
     };
   }
 
@@ -229,7 +276,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
       .upload(filePath, compressed, {
         upsert: true,
         contentType: outputContentType,
-        cacheControl: "31536000", // 1 year
+        cacheControl: CACHE_CONTROL,
       });
 
     if (upError) {
@@ -239,6 +286,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
         newSize,
         saved: originalSize - newSize,
         skipped: false,
+        cacheApplied: false,
         error: `Upload failed (original untouched): ${upError.message}`,
       };
     }
@@ -250,6 +298,7 @@ async function compressFile(filePath: string): Promise<FileResult> {
     newSize,
     saved: originalSize - newSize,
     skipped: false,
+    cacheApplied: true,
   };
 }
 
@@ -286,6 +335,7 @@ async function main() {
   let totalNew = 0;
   let processed = 0;
   let skipped = 0;
+  let cacheApplied = 0;
   let errors = 0;
   const errorLog: string[] = [];
 
@@ -295,6 +345,8 @@ async function main() {
 
     try {
       const result = await compressFile(file.fullPath);
+
+      if (result.cacheApplied) cacheApplied++;
 
       if (result.error) {
         console.error(`${progress} ❌ ${file.fullPath}: ${result.error}`);
@@ -307,7 +359,7 @@ async function main() {
 
       if (result.skipped) {
         console.log(
-          `${progress} ⏭️  ${file.fullPath} (${formatBytes(result.originalSize)}) — skipped`
+          `${progress} ⏭️  ${file.fullPath} (${formatBytes(result.originalSize)}) — not resized, cache header applied`
         );
         skipped++;
         totalOriginal += result.originalSize;
@@ -341,7 +393,10 @@ async function main() {
   console.log("═══════════════════════════════════════");
   console.log(`  Images found:      ${imageFiles.length}`);
   console.log(`  Compressed:        ${processed}`);
-  console.log(`  Skipped:           ${skipped}`);
+  console.log(`  Not resized:       ${skipped}`);
+  console.log(
+    `  Cache header set:  ${cacheApplied}${DRY_RUN ? " (would be)" : ""}`
+  );
   console.log(`  Errors:            ${errors}`);
   console.log(`  Total before:      ${formatBytes(totalOriginal)}`);
   console.log(`  Total after:       ${formatBytes(totalNew)}`);
