@@ -49,7 +49,7 @@ export default function Filters({
   }, []);
 
   const amenities = parseList(searchParams.get("amenities")) as AmenityFilterKey[];
-  const area = searchParams.get("area") ?? "";
+  const areas = parseList(searchParams.get("area"));
   const minPrice = searchParams.get("minPrice") ?? "";
   const maxPrice = searchParams.get("maxPrice") ?? "";
   const bedrooms = searchParams.get("bedrooms") ?? "";
@@ -57,7 +57,7 @@ export default function Filters({
   const search = searchParams.get("search") ?? "";
 
   const hasActiveFilters =
-    amenities.length > 0 || area || minPrice || maxPrice || bedrooms || maxGuests || search;
+    amenities.length > 0 || areas.length > 0 || minPrice || maxPrice || bedrooms || maxGuests || search;
 
   function update(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -78,6 +78,13 @@ export default function Filters({
     update({ amenities: next.length ? next.join(",") : null });
   }
 
+  function toggleArea(name: string) {
+    const next = areas.includes(name)
+      ? areas.filter((a) => a !== name)
+      : [...areas, name];
+    update({ area: next.length ? next.join(",") : null });
+  }
+
   function reset() {
     router.push(target, { scroll: false });
     setSheetOpen(false);
@@ -88,16 +95,17 @@ export default function Filters({
       {/* Area */}
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm-500">
-          Area
+          Area{areas.length > 0 ? ` (${areas.length} selected)` : " — pick one or more"}
         </p>
         <div className="flex flex-wrap gap-2">
           {BATROUN_AREAS.map((a) => {
-            const active = area === a.name;
+            const active = areas.includes(a.name);
             return (
               <button
                 key={a.slug}
                 type="button"
-                onClick={() => update({ area: active ? null : a.name })}
+                onClick={() => toggleArea(a.name)}
+                aria-pressed={active}
                 className={`inline-flex h-9 items-center rounded-full border px-4 text-xs font-medium transition ${
                   active
                     ? "border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]"
@@ -238,7 +246,7 @@ export default function Filters({
           Filters
           {hasActiveFilters && (
             <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent)] text-[11px] font-semibold text-white">
-              {amenities.length + [area, minPrice, maxPrice, bedrooms, maxGuests, search].filter(Boolean).length}
+              {amenities.length + [minPrice, maxPrice, bedrooms, maxGuests, search].filter(Boolean).length + areas.length}
             </span>
           )}
         </button>

@@ -12,7 +12,10 @@ export default async function AdminDashboardPage() {
     getHostsWithListingCounts(),
   ])
 
-  const totalChalets = listings.length
+  const typeOf = (l: (typeof listings)[number]) => l.listing_type ?? 'daily'
+  const totalChalets = listings.filter((l) => typeOf(l) === 'daily').length
+  const totalSeasonal = listings.filter((l) => typeOf(l) === 'seasonal').length
+  const totalForSale = listings.filter((l) => typeOf(l) === 'sale').length
   const activeHosts = hosts.length
   const activeListings = listings.filter((l) => l.is_active).length
 
@@ -25,25 +28,40 @@ export default async function AdminDashboardPage() {
       {/* Page header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-warm-900">Overview</h1>
-        <Link
-          href="/admin/listings/new"
-          style={{ backgroundColor: 'var(--accent)' }}
-          className="inline-flex h-11 md:h-9 items-center rounded-lg px-4 text-sm font-medium text-white transition hover:opacity-90"
-        >
-          + New chalet
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { type: 'daily', label: '+ New chalet' },
+            { type: 'seasonal', label: '+ New seasonal rental' },
+            { type: 'sale', label: '+ New property for sale' },
+          ].map(({ type, label }) => (
+            <Link
+              key={type}
+              href={`/admin/listings/new?type=${type}`}
+              style={type === 'daily' ? { backgroundColor: 'var(--accent)' } : undefined}
+              className={`inline-flex h-11 md:h-9 items-center rounded-lg px-4 text-sm font-medium transition hover:opacity-90 ${
+                type === 'daily'
+                  ? 'text-white'
+                  : 'border border-sand-200 bg-white text-warm-700 hover:bg-sand-50'
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
-          { label: 'Total chalets', value: totalChalets },
+          { label: 'Daily chalets', value: totalChalets },
+          { label: 'Seasonal rentals', value: totalSeasonal },
+          { label: 'Properties for sale', value: totalForSale },
           { label: 'Active hosts', value: activeHosts },
           { label: 'Active listings', value: activeListings },
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="rounded-xl border border-sand-200 bg-white px-6 py-5"
+            className="rounded-xl border border-sand-200 bg-white px-4 py-4 sm:px-6 sm:py-5"
           >
             <p className="text-sm text-warm-500">{label}</p>
             <p className="mt-1 text-3xl font-semibold text-warm-900">{value}</p>
@@ -55,7 +73,7 @@ export default async function AdminDashboardPage() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-warm-900">
-            Recent chalets
+            Recent listings
           </h2>
           <Link
             href="/admin/listings"
@@ -65,10 +83,10 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
         <div className="overflow-x-auto rounded-xl border border-sand-200 bg-white">
-          <table className="w-full min-w-[560px] text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead className="border-b border-sand-200 bg-sand-50 text-left">
               <tr>
-                {['Title', 'Host', 'Price / night', 'Status'].map((h) => (
+                {['Title', 'Type', 'Host', 'Price', 'Status'].map((h) => (
                   <th key={h} className="px-4 py-3 font-medium text-warm-600">
                     {h}
                   </th>
@@ -80,10 +98,10 @@ export default async function AdminDashboardPage() {
               {recentChalets.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-4 py-10 text-center text-sm text-warm-400"
                   >
-                    No chalets yet.
+                    No listings yet.
                   </td>
                 </tr>
               ) : (
@@ -91,6 +109,9 @@ export default async function AdminDashboardPage() {
                   <tr key={listing.id} className="border-b border-sand-100 last:border-0">
                     <td className="px-4 py-3 font-medium text-warm-900">
                       {listing.title}
+                    </td>
+                    <td className="px-4 py-3 text-warm-500">
+                      {listing.listing_type === 'sale' ? 'For sale' : listing.listing_type === 'seasonal' ? 'Seasonal' : 'Daily'}
                     </td>
                     <td className="px-4 py-3 text-warm-500">
                       {listing.host_name}

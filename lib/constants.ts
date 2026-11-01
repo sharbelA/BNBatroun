@@ -100,3 +100,38 @@ export const SITE = {
   currencySymbol: "$",
   whatsappNumber: "", // set when ready
 } as const;
+
+// ─── Listing types ──────────────────────────────────────────
+export const LISTING_TYPES = ["daily", "seasonal", "sale"] as const;
+export type ListingTypeKey = (typeof LISTING_TYPES)[number];
+
+export const LISTING_TYPE_META: Record<
+  ListingTypeKey,
+  { label: string; adminLabel: string; publicPath: string; priceLabel: string }
+> = {
+  daily: { label: "Daily", adminLabel: "chalet", publicPath: "/chalets", priceLabel: "Price per night ($)" },
+  seasonal: { label: "Seasonal", adminLabel: "seasonal rental", publicPath: "/seasonal", priceLabel: "Rent ($)" },
+  sale: { label: "For sale", adminLabel: "property", publicPath: "/for-sale", priceLabel: "Asking price ($)" },
+};
+
+export function parseListingType(value: unknown): ListingTypeKey {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return (LISTING_TYPES as readonly string[]).includes(raw as string)
+    ? (raw as ListingTypeKey)
+    : "daily";
+}
+
+export const PRICE_PERIODS = [
+  { value: "month", label: "per month" },
+  { value: "season", label: "per season" },
+  { value: "year", label: "per year" },
+] as const;
+
+export const PROPERTY_KINDS = [
+  { value: "apartment", label: "Apartment" },
+  { value: "villa", label: "Villa" },
+  { value: "house", label: "House" },
+  { value: "chalet", label: "Chalet" },
+  { value: "land", label: "Land" },
+  { value: "commercial", label: "Commercial" },
+] as const;

@@ -8,7 +8,8 @@ export default async function ReorderPage() {
   const listings = await getAdminListings();
 
   // Sort by display_order
-  const sorted = [...listings].sort(
+  const sorted = listings
+    .filter((l) => (l.listing_type ?? "daily") === "daily").sort(
     (a, b) => (a.display_order ?? 999) - (b.display_order ?? 999)
   );
 

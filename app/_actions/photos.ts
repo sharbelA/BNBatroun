@@ -34,10 +34,24 @@ export async function deletePhotoAction(imageId: string, storagePath: string, li
   const { data: profile } = (await supabase.from("profiles").select("role").eq("id", user.id).single()) as { data: { role: string } | null };
   if (!profile || profile.role !== "admin") return { error: "Admin access required" };
 
-  if (storagePath) await supabase.storage.from("listing-photos").remove([storagePath]);
+  const { data: image } = await supabase.from("listing_images").select("url").eq("id", imageId).single();
 
   const { error } = await supabase.from("listing_images").delete().eq("id", imageId);
   if (error) return { error: error.message };
+
+  // A copied listing (e.g. daily -> seasonal) shares the same file, so only remove
+  // it from storage once no other listing still points at it.
+  if (storagePath) {
+    let stillUsed = false;
+    if (image?.url) {
+      const { count } = await supabase
+        .from("listing_images")
+        .select("id", { count: "exact", head: true })
+        .eq("url", image.url);
+      stillUsed = (count ?? 0) > 0;
+    }
+    if (!stillUsed) await supabase.storage.from("listing-photos").remove([storagePath]);
+  }
 
   revalidatePath(`/admin/listings/${listingId}/photos`);
   revalidatePath("/");

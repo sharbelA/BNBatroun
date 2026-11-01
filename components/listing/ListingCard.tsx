@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { Icon, Badge, ImageCarousel } from "@/components/ui";
 import { Listing } from "@/lib/types";
-import { SITE } from "@/lib/constants";
+import { LISTING_TYPE_META, PRICE_PERIODS, PROPERTY_KINDS, SITE } from "@/lib/constants";
 
 export default function ListingCard({ listing }: { listing: Listing }) {
   const [isSaved, setIsSaved] = useState(false);
@@ -16,9 +16,13 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   }, [isSaved]);
 
   const images = listing.images ?? [];
+  const type = listing.listing_type ?? "daily";
+  const basePath = LISTING_TYPE_META[type].publicPath;
+  const period = PRICE_PERIODS.find((p) => p.value === listing.price_period)?.label;
+  const kind = PROPERTY_KINDS.find((k) => k.value === listing.property_kind)?.label;
 
   return (
-    <Link href={listing.slug ? `/chalets/${listing.slug}` : "/chalets"} className="group block card-hover">
+    <Link href={listing.slug ? `${basePath}/${listing.slug}` : basePath} className="group block card-hover">
       <div className="relative overflow-hidden rounded-2xl border border-[var(--border-light)]">
         {images.length > 0 ? (
           <div className="img-zoom">
@@ -39,9 +43,15 @@ export default function ListingCard({ listing }: { listing: Listing }) {
         >
           <Icon name="heart" size={24} fill={isSaved ? "var(--accent)" : "rgba(0,0,0,0.5)"} stroke="white" strokeWidth={2} />
         </button>
-        {listing.is_featured && (
+        {type === "daily" ? (
+          listing.is_featured && (
+            <div className="absolute top-3 left-3 z-10">
+              <Badge>Guest favourite</Badge>
+            </div>
+          )
+        ) : (
           <div className="absolute top-3 left-3 z-10">
-            <Badge>Guest favourite</Badge>
+            <Badge>{type === "sale" ? (kind ?? "For sale") : "Seasonal rental"}</Badge>
           </div>
         )}
       </div>
@@ -58,17 +68,24 @@ export default function ListingCard({ listing }: { listing: Listing }) {
         </p>
         <p className="text-sm text-[var(--muted)] mt-0.5">
           {listing.bedrooms} bedroom{listing.bedrooms !== 1 ? "s" : ""} ·{" "}
-          {listing.max_guests} guest{listing.max_guests !== 1 ? "s" : ""}
+          {type === "daily"
+            ? `${listing.max_guests} guest${listing.max_guests !== 1 ? "s" : ""}`
+            : listing.area_sqm
+              ? `${listing.area_sqm} m²`
+              : `${listing.bathrooms} bath${listing.bathrooms !== 1 ? "s" : ""}`}
         </p>
         <p className="mt-2">
-          {(listing.weekend_price ?? listing.price) !== listing.price && (
+          {type === "daily" && (listing.weekend_price ?? listing.price) !== listing.price && (
             <span className="text-sm text-[var(--muted)] mr-0.5">From </span>
           )}
           <span className="text-[15px] font-semibold text-[var(--foreground)]">
             {SITE.currencySymbol}
-            {listing.price}
+            {type === "daily" ? listing.price : listing.price.toLocaleString("en-US")}
           </span>{" "}
-          <span className="text-sm text-[var(--muted)]">/ night</span>
+          {type === "daily" && <span className="text-sm text-[var(--muted)]">/ night</span>}
+          {type === "seasonal" && period && (
+            <span className="text-sm text-[var(--muted)]">{period.replace("per ", "/ ")}</span>
+          )}
         </p>
       </div>
     </Link>

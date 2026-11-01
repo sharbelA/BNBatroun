@@ -8,6 +8,7 @@ import { Icon, Container } from "@/components/ui";
 import { getCurrentUser } from "@/app/_actions/auth";
 import { SITE } from "@/lib/constants";
 import UserMenu from "./UserMenu";
+import SectionNav from "./SectionNav";
 import SearchBarDesktop, { FilterButton } from "./SearchBarDesktop";
 import SearchBarMobile, { MobileFilterButton } from "./SearchBarMobile";
 
@@ -35,6 +36,7 @@ export default async function Header() {
           <FilterButton />
 
           <div className="flex items-center gap-1 shrink-0">
+            <SectionNav variant="desktop" />
             <Link
               href="/list-your-chalet"
               className="hidden lg:block text-sm font-medium hover:bg-[var(--surface)] rounded-full px-4 py-2.5 transition-colors duration-200"
@@ -55,6 +57,9 @@ export default async function Header() {
             <UserMenu user={user} />
           </div>
         </div>
+
+        {/* Mobile / tablet: section switcher */}
+        <SectionNav variant="mobile" />
 
         {/* Mobile: search bar full width with filter icon */}
         <div className="md:hidden flex items-center gap-2 mb-4">

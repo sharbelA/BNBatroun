@@ -9,7 +9,13 @@ import {
   updateListingAction,
   type ActionState,
 } from "@/app/_actions/listings";
-import { BATROUN_AREAS } from "@/lib/constants";
+import {
+  BATROUN_AREAS,
+  LISTING_TYPE_META,
+  PRICE_PERIODS,
+  PROPERTY_KINDS,
+  type ListingTypeKey,
+} from "@/lib/constants";
 
 const AMENITIES = [
   { name: "wifi", label: "WiFi" },
@@ -26,6 +32,8 @@ interface ListingFormProps {
   listing?: AdminListing | null;
   hosts?: Pick<Profile, "id" | "name" | "role">[];
   mode: "create" | "edit";
+  /** Which kind of listing this form manages. Defaults to the listing's own type, else daily. */
+  type?: ListingTypeKey;
 }
 
 const initial: ActionState = { error: null };
@@ -34,7 +42,13 @@ export default function ListingForm({
   listing,
   hosts,
   mode,
+  type,
 }: ListingFormProps) {
+  const listingType: ListingTypeKey = listing?.listing_type ?? type ?? "daily";
+  const isDaily = listingType === "daily";
+  const isSeasonal = listingType === "seasonal";
+  const isSale = listingType === "sale";
+  const noun = LISTING_TYPE_META[listingType].adminLabel;
   const action = mode === "create" ? createListingAction : updateListingAction;
   const [state, formAction, isPending] = useActionState(action, initial);
 
@@ -42,6 +56,7 @@ export default function ListingForm({
     <form action={formAction} className="flex flex-col gap-8">
       {/* Hidden ID for edit mode */}
       {listing?.id && <input type="hidden" name="id" value={listing.id} />}
+      <input type="hidden" name="listing_type" value={listingType} />
 
       {/* Error / success messages */}
       {state.error && (
@@ -104,7 +119,13 @@ export default function ListingForm({
             type="text"
             required
             defaultValue={listing?.title ?? ""}
-            placeholder="e.g. Sunset Villa Batroun"
+            placeholder={
+              isSale
+                ? "e.g. Sea-view apartment in Batroun"
+                : isSeasonal
+                  ? "e.g. Furnished chalet for the summer season"
+                  : "e.g. Sunset Villa Batroun"
+            }
             className={inputCls}
           />
         </Field>
@@ -166,7 +187,13 @@ export default function ListingForm({
             rows={5}
             required
             defaultValue={listing?.description ?? ""}
-            placeholder="Describe the chalet — views, feel, highlights…"
+            placeholder={
+              isSale
+                ? "Describe the property — size, condition, views, what's included…"
+                : isSeasonal
+                  ? "Describe the rental — furnishing, season dates, what's included…"
+                  : "Describe the chalet — views, feel, highlights…"
+            }
             className={`${inputCls} resize-none py-3 !h-auto`}
           />
         </Field>
@@ -175,35 +202,88 @@ export default function ListingForm({
       {/* ── Pricing & capacity ─────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-warm-500">
-          Pricing &amp; capacity
+          {isDaily ? "Pricing & capacity" : isSale ? "Price & details" : "Rent & details"}
         </h2>
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Weekday price ($)" htmlFor="price" hint="Mon–Thu">
-            <input
-              id="price"
-              name="price"
-              type="number"
-              min={1}
-              step="1"
-              required
-              defaultValue={listing?.price ?? ""}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="Weekend price ($)" htmlFor="weekend_price" hint="Fri–Sun">
-            <input
-              id="weekend_price"
-              name="weekend_price"
-              type="number"
-              min={1}
-              step="1"
-              required
-              defaultValue={listing?.weekend_price ?? listing?.price ?? ""}
-              className={inputCls}
-            />
-          </Field>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
+        {isDaily ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Weekday price ($)" htmlFor="price" hint="Mon–Thu">
+              <input
+                id="price"
+                name="price"
+                type="number"
+                min={1}
+                step="1"
+                required
+                defaultValue={listing?.price ?? ""}
+                className={inputCls}
+              />
+            </Field>
+            <Field label="Weekend price ($)" htmlFor="weekend_price" hint="Fri–Sun">
+              <input
+                id="weekend_price"
+                name="weekend_price"
+                type="number"
+                min={1}
+                step="1"
+                required
+                defaultValue={listing?.weekend_price ?? listing?.price ?? ""}
+                className={inputCls}
+              />
+            </Field>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field
+              label={LISTING_TYPE_META[listingType].priceLabel}
+              htmlFor="price"
+              hint={isSale ? "One-time asking price" : "Rent for the period selected"}
+            >
+              <input
+                id="price"
+                name="price"
+                type="number"
+                min={1}
+                step="1"
+                required
+                defaultValue={listing?.price ?? ""}
+                className={inputCls}
+              />
+            </Field>
+            {isSeasonal && (
+              <Field label="Rent period" htmlFor="price_period">
+                <select
+                  id="price_period"
+                  name="price_period"
+                  defaultValue={listing?.price_period ?? "month"}
+                  className={inputCls}
+                >
+                  {PRICE_PERIODS.map((p) => (
+                    <option key={p.value} value={p.value}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
+            {isSale && (
+              <Field label="Property type" htmlFor="property_kind">
+                <select
+                  id="property_kind"
+                  name="property_kind"
+                  defaultValue={listing?.property_kind ?? "apartment"}
+                  className={inputCls}
+                >
+                  {PROPERTY_KINDS.map((k) => (
+                    <option key={k.value} value={k.value}>
+                      {k.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <Field label="Bedrooms" htmlFor="bedrooms">
             <input
               id="bedrooms"
@@ -226,39 +306,58 @@ export default function ListingForm({
               className={inputCls}
             />
           </Field>
-          <Field label="Max guests" htmlFor="max_guests">
-            <input
-              id="max_guests"
-              name="max_guests"
-              type="number"
-              min={1}
-              required
-              defaultValue={listing?.max_guests ?? 2}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="Guests included in base price" htmlFor="base_guests" hint="Extra guests are charged separately">
-            <input
-              id="base_guests"
-              name="base_guests"
-              type="number"
-              min={1}
-              required
-              defaultValue={listing?.base_guests ?? listing?.max_guests ?? 2}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="Extra guest fee ($/night)" htmlFor="price_per_extra_guest" hint="0 = no extra charge">
-            <input
-              id="price_per_extra_guest"
-              name="price_per_extra_guest"
-              type="number"
-              min={0}
-              step="0.01"
-              defaultValue={listing?.price_per_extra_guest ?? 0}
-              className={inputCls}
-            />
-          </Field>
+          {isDaily ? (
+            <Field label="Max guests" htmlFor="max_guests">
+              <input
+                id="max_guests"
+                name="max_guests"
+                type="number"
+                min={1}
+                required
+                defaultValue={listing?.max_guests ?? 2}
+                className={inputCls}
+              />
+            </Field>
+          ) : (
+            <Field label="Area (m²)" htmlFor="area_sqm">
+              <input
+                id="area_sqm"
+                name="area_sqm"
+                type="number"
+                min={1}
+                step="1"
+                defaultValue={listing?.area_sqm ?? ""}
+                placeholder="e.g. 120"
+                className={inputCls}
+              />
+            </Field>
+          )}
+          {isDaily && (
+            <>
+              <Field label="Guests included in base price" htmlFor="base_guests" hint="Extra guests are charged separately">
+                <input
+                  id="base_guests"
+                  name="base_guests"
+                  type="number"
+                  min={1}
+                  required
+                  defaultValue={listing?.base_guests ?? listing?.max_guests ?? 2}
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="Extra guest fee ($/night)" htmlFor="price_per_extra_guest" hint="0 = no extra charge">
+                <input
+                  id="price_per_extra_guest"
+                  name="price_per_extra_guest"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  defaultValue={listing?.price_per_extra_guest ?? 0}
+                  className={inputCls}
+                />
+              </Field>
+            </>
+          )}
         </div>
       </section>
 
@@ -323,6 +422,8 @@ export default function ListingForm({
         </div>
       </section>
 
+      {isDaily && (
+        <>
       {/* ── House rules ────────────────────────── */}
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-warm-500">
@@ -343,6 +444,8 @@ export default function ListingForm({
           />
         </Field>
       </section>
+        </>
+      )}
 
       {/* ── Settings ───────────────────────────── */}
       <section className="flex flex-col gap-3">
@@ -365,7 +468,7 @@ export default function ListingForm({
             defaultChecked={listing?.is_featured ?? false}
             className="h-4 w-4 rounded border-sand-300 accent-sea-600"
           />
-          Featured (shown on home page)
+          {isDaily ? "Featured (shown on home page)" : "Featured (highlighted in its section)"}
         </label>
       </section>
 
@@ -379,11 +482,11 @@ export default function ListingForm({
           {isPending
             ? "Saving…"
             : mode === "create"
-              ? "Create chalet"
+              ? `Create ${noun}`
               : "Save changes"}
         </button>
         <Link
-          href="/admin/listings"
+          href={`/admin/listings?type=${listingType}`}
           className="inline-flex h-11 md:h-10 items-center rounded-lg border border-sand-200 px-6 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
         >
           Cancel

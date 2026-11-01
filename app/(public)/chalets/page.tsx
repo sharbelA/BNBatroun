@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { Container } from "@/components/ui";
 import { getFilteredListings } from "@/lib/supabase/queries/listings";
-import { AMENITY_FILTER_KEYS, type AmenityFilterKey } from "@/lib/constants";
+import { AMENITY_FILTER_KEYS, AREA_NAMES, type AmenityFilterKey } from "@/lib/constants";
 import ListingGrid from "@/components/listing/ListingGrid";
 import Filters from "./_components/Filters";
 
@@ -17,6 +17,15 @@ function parseAmenities(value: string | string[] | undefined): AmenityFilterKey[
     .filter((key): key is AmenityFilterKey =>
       (AMENITY_FILTER_KEYS as readonly string[]).includes(key)
     );
+}
+
+function parseAreas(value: string | string[] | undefined): string[] {
+  const raw = Array.isArray(value) ? value : [value];
+  const known = new Set<string>(AREA_NAMES);
+  return raw
+    .flatMap((v) => (v ? v.split(",") : []))
+    .map((v) => v.trim())
+    .filter((v) => known.has(v));
 }
 
 function parseNumber(value: string | string[] | undefined): number | undefined {
@@ -39,7 +48,7 @@ export default async function ChaletsPage({
     maxPrice: parseNumber(params.maxPrice),
     bedrooms: parseNumber(params.bedrooms),
     maxGuests: parseNumber(params.maxGuests),
-    area: typeof params.area === "string" ? params.area : undefined,
+    areas: parseAreas(params.area),
     search: typeof params.search === "string" ? params.search : undefined,
   };
 

@@ -1,5 +1,5 @@
 import { Listing } from "@/lib/types";
-import { AMENITY_FILTER_KEYS, type AmenityFilterKey } from "@/lib/constants";
+import { AMENITY_FILTER_KEYS, type AmenityFilterKey, type ListingTypeKey } from "@/lib/constants";
 import type {
   Listing as DbListing,
   ListingImage,
@@ -44,6 +44,7 @@ export async function getListings(options: { featured?: boolean; limit?: number 
     .from("listings")
     .select("*, listing_images(url, display_order)")
     .eq("is_active", true)
+    .eq("listing_type", "daily")
     .not("slug", "is", null)
     .neq("slug", "");
   if (options.featured) query = query.eq("is_featured", true);
@@ -63,6 +64,7 @@ export async function getListingBySlug(slug: string): Promise<Listing | null> {
     .select("*, listing_images(url, display_order)")
     .eq("slug", slug)
     .eq("is_active", true)
+    .eq("listing_type", "daily")
     .single();
   if (error) { console.error("[getListingBySlug]", error.message); return null; }
   return toListing(data as DbListing & { listing_images: ImageRow[] });
@@ -76,7 +78,7 @@ export type ListingFilters = {
   maxPrice?: number;
   bedrooms?: number; // 4 means "4+"
   maxGuests?: number;
-  area?: string; // matches the `location` column
+  areas?: string[]; // matches the `location` column (any of)
   search?: string; // title search
 };
 
@@ -90,6 +92,7 @@ export async function getFilteredListings(
     .from("listings")
     .select("*, listing_images(url, display_order)")
     .eq("is_active", true)
+    .eq("listing_type", "daily")
     .not("slug", "is", null)
     .neq("slug", "");
 
@@ -105,7 +108,7 @@ export async function getFilteredListings(
         : query.eq("bedrooms", filters.bedrooms);
   }
   if (filters.maxGuests !== undefined) query = query.gte("max_guests", filters.maxGuests);
-  if (filters.area) query = query.eq("location", filters.area);
+  if (filters.areas?.length) query = query.in("location", filters.areas);
   if (filters.search) query = query.ilike("title", `%${filters.search}%`);
 
   query = query.order("display_order", { ascending: true }).order("created_at", { ascending: false });
@@ -115,16 +118,89 @@ export async function getFilteredListings(
   return (data ?? []).map((row) => toListing(row as DbListing & { listing_images: ImageRow[] }));
 }
 
-export async function getActiveSlugs(): Promise<{ slug: string; updated_at: string }[]> {
+export async function getActiveSlugs(
+  type: ListingTypeKey = "daily"
+): Promise<{ slug: string; updated_at: string }[]> {
   if (!isSupabaseConfigured) return [];
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from("listings")
     .select("slug, updated_at")
-    .eq("is_active", true);
+    .eq("is_active", true)
+    .eq("listing_type", type);
 
   if (error) { console.error("[getActiveSlugs]", error.message); return []; }
   return (data ?? []) as { slug: string; updated_at: string }[];
+}
+
+// ─── Seasonal rentals & properties for sale ─────────────────
+
+export type PropertyFilters = {
+  areas?: string[];
+  kind?: string; // property_kind (sale only)
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number; // 4 means "4+"
+};
+
+export async function getListingsByType(
+  type: Exclude<ListingTypeKey, "daily">,
+  filters: PropertyFilters = {}
+): Promise<Listing[]> {
+  if (!isSupabaseConfigured) return [];
+  const supabase = await getSupabase();
+
+  let query = supabase
+    .from("listings")
+    .select("*, listing_images(url, display_order)")
+    .eq("is_active", true)
+    .eq("listing_type", type)
+    .not("slug", "is", null)
+    .neq("slug", "");
+
+  if (filters.areas?.length) query = query.in("location", filters.areas);
+  if (filters.kind) query = query.eq("property_kind", filters.kind);
+  if (filters.minPrice !== undefined) query = query.gte("price", filters.minPrice);
+  if (filters.maxPrice !== undefined) query = query.lte("price", filters.maxPrice);
+  if (filters.bedrooms !== undefined) {
+    query =
+      filters.bedrooms >= 4
+        ? query.gte("bedrooms", 4)
+        : query.eq("bedrooms", filters.bedrooms);
+  }
+
+  query = query.order("display_order", { ascending: true }).order("created_at", { ascending: false });
+
+  const { data, error } = await query;
+  if (error) { console.error("[getListingsByType]", error.message); return []; }
+  return (data ?? []).map((row) => toListing(row as DbListing & { listing_images: ImageRow[] }));
+}
+
+export type PropertyPageData = {
+  listing: DbListing;
+  images: ListingImage[];
+};
+
+export async function getPropertyFull(
+  type: Exclude<ListingTypeKey, "daily">,
+  slug: string
+): Promise<PropertyPageData | null> {
+  if (!isSupabaseConfigured) return null;
+  const supabase = await getSupabase();
+
+  const { data: listing, error } = await supabase
+    .from("listings")
+    .select("*, listing_images(*)")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .eq("listing_type", type)
+    .single();
+  if (error || !listing) return null;
+
+  const images = ((listing as Record<string, unknown>).listing_images as ListingImage[] ?? [])
+    .sort((a, b) => a.display_order - b.display_order);
+
+  return { listing: listing as DbListing, images };
 }
 
 export type HostListing = DbListing & { cover_image: string | null };
@@ -217,6 +293,7 @@ export async function getListingFull(slug: string): Promise<ListingPageData | nu
     .select("*, listing_images(*)")
     .eq("slug", slug)
     .eq("is_active", true)
+    .eq("listing_type", "daily")
     .single();
   if (error || !listing) return null;
 

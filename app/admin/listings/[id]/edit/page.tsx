@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAdminListingById, getHosts } from "@/lib/supabase/queries/admin";
 import ListingForm from "@/app/admin/_components/ListingForm";
+import { LISTING_TYPE_META } from "@/lib/constants";
+import CopyListingButton from "@/app/admin/_components/CopyListingButton";
 import DeleteListingButton from "@/app/admin/_components/DeleteListingButton";
 
 export const metadata: Metadata = { title: "Edit chalet" };
@@ -18,16 +20,26 @@ export default async function EditListingPage(
 
   if (!listing) notFound();
 
+  const type = listing.listing_type ?? "daily";
+  const noun = LISTING_TYPE_META[type].adminLabel;
+
   return (
     <div className="mx-auto max-w-2xl">
       {/* Header */}
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <Link
-          href="/admin/listings"
+          href={`/admin/listings?type=${type}`}
           className="text-sm text-warm-500 hover:text-warm-900 transition-colors"
         >
-          ← All chalets
+          ← Back to list
         </Link>
+        {(type === "daily" || type === "seasonal") && (
+          <CopyListingButton
+            id={id}
+            target={type === "daily" ? "seasonal" : "daily"}
+            className="inline-flex h-11 md:h-9 items-center rounded-lg border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50 disabled:opacity-50"
+          />
+        )}
         <Link
           href={`/admin/listings/${id}/photos`}
           className="inline-flex h-11 md:h-9 items-center rounded-lg border border-sand-200 px-4 text-sm font-medium text-warm-700 transition hover:bg-sand-50"
@@ -37,7 +49,7 @@ export default async function EditListingPage(
       </div>
 
       <h1 className="mb-8 text-2xl font-semibold text-warm-900">
-        Edit chalet
+        Edit {noun}
       </h1>
 
       <ListingForm mode="edit" listing={listing} hosts={hosts} />

@@ -1,4 +1,5 @@
 export type Role = 'admin' | 'host' | 'guest'
+export type ListingType = 'daily' | 'seasonal' | 'sale'
 export type AvailabilityStatus = 'available' | 'booked' | 'blocked'
 
 export interface Database {
@@ -62,6 +63,10 @@ export interface Database {
           is_featured: boolean
           is_active: boolean
           display_order: number
+          listing_type: ListingType
+          price_period: string | null
+          property_kind: string | null
+          area_sqm: number | null
           created_at: string
           updated_at: string
         }
@@ -94,6 +99,10 @@ export interface Database {
           is_featured?: boolean
           is_active?: boolean
           display_order?: number
+          listing_type?: ListingType
+          price_period?: string | null
+          property_kind?: string | null
+          area_sqm?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -125,6 +134,10 @@ export interface Database {
           is_featured?: boolean
           is_active?: boolean
           display_order?: number
+          listing_type?: ListingType
+          price_period?: string | null
+          property_kind?: string | null
+          area_sqm?: number | null
           updated_at?: string
         }
       }

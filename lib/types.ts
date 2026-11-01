@@ -30,6 +30,10 @@ export interface Listing {
   is_featured: boolean;
   is_active: boolean;
   display_order: number;
+  listing_type: "daily" | "seasonal" | "sale";
+  price_period: string | null;
+  property_kind: string | null;
+  area_sqm: number | null;
   created_at: string;
   updated_at: string;
   images: string[];
